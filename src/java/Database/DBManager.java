@@ -135,7 +135,7 @@ public class DBManager implements Serializable {
     }
     
     public boolean CreaPrenotazione(Prenotazione p){
-        
+        return true;
     }
     
     //creazione prenotazione
