@@ -128,6 +128,7 @@ public class DBManager implements Serializable {
             ps.setString(2,u.getPassword());
             ps.setDouble(3,u.getCredito());
             ps.setInt(4, u.getUserID());
+            ps.executeQuery();
             return true;
         }catch(SQLException ex){
             return false;
@@ -135,7 +136,12 @@ public class DBManager implements Serializable {
     }
     
     public boolean CreaPrenotazione(Prenotazione p){
-        
+       try{
+            
+            return true;  
+       }catch(SQLException ex){
+            return false;
+        }
     }
     
     //creazione prenotazione
