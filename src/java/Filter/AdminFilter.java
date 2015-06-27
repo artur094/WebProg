@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author ivanmorandi
  */
-public class admin implements Filter {
+public class AdminFilter implements Filter {
     
     private static final boolean debug = true;
 
@@ -33,7 +33,7 @@ public class admin implements Filter {
     // configured. 
     private FilterConfig filterConfig = null;
     
-    public admin() {
+    public AdminFilter() {
     }    
     
     private void doBeforeProcessing(ServletRequest request, ServletResponse response)

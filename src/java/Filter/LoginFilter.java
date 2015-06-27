@@ -25,7 +25,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author ivanmorandi
  */
-public class login implements Filter {
+public class LoginFilter implements Filter {
     
     private static final boolean debug = true;
 
@@ -34,7 +34,7 @@ public class login implements Filter {
     // configured. 
     private FilterConfig filterConfig = null;
     
-    public login() {
+    public LoginFilter() {
     }    
     
     private void doBeforeProcessing(ServletRequest request, ServletResponse response)
@@ -115,10 +115,10 @@ public class login implements Filter {
         // reperisco il beans
         Utente user = (Utente)((HttpServletRequest)request).getSession().getAttribute("userBean");
         
-        // controllo se non ha effettuato il login
+        // controllo se non ha effettuato il LoginFilter
         if(user == null)
         {
-            // Inoltro alla pagina di login
+            // Inoltro alla pagina di LoginFilter
             (new Security()).UnauthorizedPage(
                     (HttpServletRequest) request, 
                     (HttpServletResponse) response,
