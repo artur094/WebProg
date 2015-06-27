@@ -6,7 +6,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>TestDBManager</servlet-name>
-        <url-pattern>src/java/Servlet/TestDBManager.java</url-pattern>
+        <url-pattern>/src/java/Servlet/TestDBManager.java</url-pattern>
     </servlet-mapping>
     <filter>
         <filter-name>login</filter-name>
