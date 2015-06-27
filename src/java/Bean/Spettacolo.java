@@ -20,7 +20,28 @@ public class Spettacolo {
     private String urlLocandina;
     private Date ora;
     private String sala;
+    //i campi qui sotto forse vanno cancellati, attenzione perchè vengono usati nel dbManager
+    private int IDfilm;
+    private int IDsala;
+    
+    
+    public int getIDsala() {
+        return IDsala;
+    }
 
+    public void setIDsala(int IDsala) {
+        this.IDsala = IDsala;
+    }
+    
+
+    public int getIDfilm() {
+        return IDfilm;
+    }
+
+    public void setIDfilm(int IDfilm) {
+        this.IDfilm = IDfilm;
+    }
+    
     public Date getOra() {
         return ora;
     }

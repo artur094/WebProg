@@ -14,6 +14,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -122,7 +123,7 @@ public class DBManager implements Serializable {
     
     public boolean CreaUtente(Utente u){
         try{
-            PreparedStatement ps = con.prepareStatement("INSERT INTO utente VALUES (?,?,?,?)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO utente(email,password,credito,id_ruolo) VALUES (?,?,?,?)");
             
             ps.setString(1, u.getEmail());
             ps.setString(2,u.getPassword());
@@ -137,15 +138,57 @@ public class DBManager implements Serializable {
     
     public boolean CreaPrenotazione(Prenotazione p){
        try{
+            PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,?");
             
+            java.sql.Timestamp dataTmp = new java.sql.Timestamp(p.getDataOraOperazione().getTime());
+            
+            ps.setInt(1, p.getUtente().getUserID());
+            ps.setInt(2, p.getSpettacoloID());
+            ps.setDouble(3, p.getPrezzo());
+            ps.setInt(4, p.getPostoID());      
+            ps.setTimestamp(5, dataTmp);
+            ps.executeQuery();
             return true;  
        }catch(SQLException ex){
             return false;
         }
     }
     
-    //creazione prenotazione
     //cancellare prenozatione
+    public boolean CancellaPrenotazione(int IDprenotazione){
+        try{
+            PreparedStatement ps = con.prepareStatement("DELETE * FROM prenotazione WHERE id_prenotazione = ?");
+            ps.setInt(1, IDprenotazione);
+            ps.executeQuery();
+            return true;
+        }catch(SQLException ex){
+            return false;
+        }
+    }
+    
     //cancellare utente
+    public boolean CancellaUtente(int IDutente){
+        try{
+            PreparedStatement ps = con.prepareStatement("DELETE * FROM utente WHERE id_utente = ?");
+            ps.setInt(1, IDutente);
+            ps.executeQuery();
+            return true;
+        }catch(SQLException ex){
+            return false;
+        }     
+    }
+    
     //creazione spettacoli
+    public boolean CreaSpettacolo(Spettacolo s){
+        try{
+            PreparedStatement ps = con.prepareStatement("INSERT INTO spettacolo(id_film,data_ora,id_sala) VALUES (?,?,?)");
+            ps.setInt(1,s.getIDfilm());
+            ps.setTimestamp(2, new Timestamp(s.getOra().getTime()));
+            ps.setInt(3, s.getIDfilm());
+            ps.executeQuery();
+            return true;
+        }catch(SQLException ex){
+            return false;
+        } 
+    }
 }
