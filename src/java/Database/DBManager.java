@@ -49,13 +49,13 @@ public class DBManager implements Serializable {
         }
     }
     
-    public Utente authenticate(String username, String password) throws SQLException
+    public Utente authenticate(String email, String password) throws SQLException
     {
-        PreparedStatement ps = con.prepareStatement("SELECT * FROM utente,ruolo WHERE username = ? AND password = ? AND utente.id_ruolo = ruolo.id_ruolo");
+        PreparedStatement ps = con.prepareStatement("SELECT * FROM utente,ruolo WHERE email = ? AND password = ? AND utente.id_ruolo = ruolo.id_ruolo");
         
         try
         {
-            ps.setString(1, username);
+            ps.setString(1, email);
             ps.setString(2, password);
             
             ResultSet rs = ps.executeQuery();
@@ -66,6 +66,7 @@ public class DBManager implements Serializable {
                     user.setEmail(rs.getString("email"));
                     user.setCredito(rs.getDouble("credito"));
                     user.setRuolo(rs.getString("ruolo"));
+                    user.setPassword(password);
                     return user;
                 } else {
                     return null;
