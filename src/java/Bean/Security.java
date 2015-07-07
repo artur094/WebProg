@@ -36,6 +36,20 @@ import javax.servlet.http.HttpSession;
     }
     
     /**
+     * Metodo da richiamare se si vuole redirezionare alla pagina di login
+     * @param request
+     * @param response
+     * @param session
+     * @throws ServletException
+     * @throws IOException 
+     */
+    public void GoToLoginPage(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+            throws ServletException, IOException
+    {
+        request.getRequestDispatcher("/login.jsp").forward(request, response);
+    }
+    
+    /**
      * Metodo da richiamare se un utente non Admin cerca di accedere alle pagine amministrative
      * @param request
      * @param response
@@ -44,6 +58,12 @@ import javax.servlet.http.HttpSession;
      * @throws IOException 
      */
     public void UnauthorizedAdminPage(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+            throws ServletException, IOException
+    {
+        request.getRequestDispatcher("/error.jsp").forward(request, response);
+    }
+    
+    public void ErrorPage(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws ServletException, IOException
     {
         request.getRequestDispatcher("/error.jsp").forward(request, response);
