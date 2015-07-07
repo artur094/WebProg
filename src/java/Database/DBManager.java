@@ -37,7 +37,7 @@ public class DBManager implements Serializable {
             throw new RuntimeException(e.toString(), e);
         }
         
-        Connection con = DriverManager.getConnection(dburl);
+        Connection con = DriverManager.getConnection(dburl, "root","root");
         this.con = con;
     }
     
@@ -49,34 +49,39 @@ public class DBManager implements Serializable {
         }
     }
     
-    public Utente authenticate(String email, String password) throws SQLException
+    public Utente authenticate(String email, String password)
     {
-        PreparedStatement ps = con.prepareStatement("SELECT * FROM utente,ruolo WHERE email = ? AND password = ? AND utente.id_ruolo = ruolo.id_ruolo");
-        
-        try
-        {
-            ps.setString(1, email);
-            ps.setString(2, password);
-            
-            ResultSet rs = ps.executeQuery();
-            
-            try{
-                if (rs.next()) {
-                    Utente user = new Utente();
-                    user.setEmail(rs.getString("email"));
-                    user.setCredito(rs.getDouble("credito"));
-                    user.setRuolo(rs.getString("ruolo"));
-                    user.setPassword(password);
-                    return user;
-                } else {
-                    return null;
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM utente,ruolo WHERE email = ? AND password = ? AND utente.id_ruolo = ruolo.id_ruolo");
+
+            try
+            {
+                ps.setString(1, email);
+                ps.setString(2, password);
+
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    if (rs.next()) {
+                        Utente user = new Utente();
+                        user.setEmail(rs.getString("email"));
+                        user.setCredito(rs.getDouble("credito"));
+                        user.setRuolo(rs.getString("ruolo"));
+                        user.setPassword(password);
+                        return user;
+                    } else {
+                        return null;
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
                 }
-            } finally {
-                // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
-                rs.close();
+            } finally{
+                ps.close();
             }
-        } finally{
-            ps.close();
+        }catch(SQLException sqlex)
+        {
+            return null;
         }
     }
     
@@ -126,11 +131,11 @@ public class DBManager implements Serializable {
         try{
             PreparedStatement ps = con.prepareStatement("INSERT INTO utente(email,password,credito,id_ruolo) VALUES (?,?,?,?)");
             
-            ps.setString(1, u.getEmail());
+            ps.setString(1,u.getEmail());
             ps.setString(2,u.getPassword());
             ps.setDouble(3,u.getCredito());
-            ps.setInt(4, u.getUserID());
-            ps.executeQuery();
+            ps.setInt(4, 2); // 2 --> valore user (da recuperare dinamicamente)
+            ps.executeUpdate();
             return true;
         }catch(SQLException ex){
             return false;

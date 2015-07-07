@@ -97,3 +97,6 @@ CREATE TABLE prenotazione
     constraint prenotazione_prezzo_fk foreign key (id_prezzo) references prezzo(id_prezzo),
     constraint prenotazione_posto_fk foreign key (id_posto) references posto(id_posto)
 );
+
+insert into ruolo (ruolo) values ('admin');
+insert into ruolo (ruolo) values ('user');

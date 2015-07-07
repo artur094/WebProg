@@ -12,6 +12,10 @@
         <servlet-name>TestDBManager</servlet-name>
         <url-pattern>/src/java/Servlet/TestDBManager.java</url-pattern>
     </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Controller</servlet-name>
+        <url-pattern>/Controller</url-pattern>
+    </servlet-mapping>
     <filter>
         <filter-name>login</filter-name>
         <filter-class>Filter.LoginFilter</filter-class>
@@ -31,10 +35,6 @@
         <url-pattern>/auth/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
-    <servlet-mapping>
-        <servlet-name>Controller</servlet-name>
-        <url-pattern>/Controller</url-pattern>
-    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

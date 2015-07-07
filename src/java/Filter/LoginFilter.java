@@ -43,26 +43,18 @@ public class LoginFilter implements Filter {
             log("login:DoBeforeProcessing");
         }
 
-	// Write code here to process the request and/or response before
-        // the rest of the filter chain is invoked.
-	// For example, a logging filter might log items on the request object,
-        // such as the parameters.
-	/*
-         for (Enumeration en = request.getParameterNames(); en.hasMoreElements(); ) {
-         String name = (String)en.nextElement();
-         String values[] = request.getParameterValues(name);
-         int n = values.length;
-         StringBuffer buf = new StringBuffer();
-         buf.append(name);
-         buf.append("=");
-         for(int i=0; i < n; i++) {
-         buf.append(values[i]);
-         if (i < n-1)
-         buf.append(",");
-         }
-         log(buf.toString());
-         }
-         */
+	// reperisco il beans
+        Utente user = (Utente)((HttpServletRequest)request).getSession().getAttribute("userBean");
+        
+        // controllo se non ha effettuato il LoginFilter
+        if(user == null)
+        {
+            // Inoltro alla pagina di LoginFilter
+            (new Security()).UnauthorizedPage(
+                    (HttpServletRequest) request, 
+                    (HttpServletResponse) response,
+                    ((HttpServletRequest)request).getSession());
+        }
     }    
     
     private void doAfterProcessing(ServletRequest request, ServletResponse response)
@@ -109,21 +101,7 @@ public class LoginFilter implements Filter {
         
         doBeforeProcessing(request, response);
         
-        
-        
-        
-        // reperisco il beans
-        Utente user = (Utente)((HttpServletRequest)request).getSession().getAttribute("userBean");
-        
-        // controllo se non ha effettuato il LoginFilter
-        if(user == null)
-        {
-            // Inoltro alla pagina di LoginFilter
-            (new Security()).UnauthorizedPage(
-                    (HttpServletRequest) request, 
-                    (HttpServletResponse) response,
-                    ((HttpServletRequest)request).getSession());
-        }
+
         
         
         

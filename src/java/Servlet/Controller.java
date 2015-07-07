@@ -36,11 +36,22 @@ public class Controller extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        String operation = (String)request.getSession().getAttribute("op");
+       
+        if(dbm == null)
+            return;
+        
+        String operation = (String)request.getParameter("op");
+        String email = (String)request.getParameter("email");
+        String pass = (String)request.getParameter("password");
         
         switch(operation)
         {
-            case "login": break;
+            case "login":
+                login(request, response, email, pass);
+                break;
+            case "registrazione":
+                registrazione(request, response, email, pass);
+                break;
             case "pren": break;
             case "admin": break;
             case "pay": break;
@@ -52,10 +63,15 @@ public class Controller extends HttpServlet {
     protected void login(HttpServletRequest request, HttpServletResponse response, String email, String password)
     {
         Utente user = null;
-        try{
-            user = dbm.authenticate(email, password);
-        }
-        catch(SQLException sqlex)
+        
+        user = dbm.authenticate(email, password);
+        
+        
+        // se qualcosa è andato storto... 
+        // o email-password sbagliata
+        // o altri errori
+        // risendo alla pagina di login
+        if(user == null)
         {
             try{
                 (new Security()).ErrorPage(request, response, request.getSession());
@@ -69,26 +85,43 @@ public class Controller extends HttpServlet {
                 log("IOException - Controller: "+ioexc.toString());
             }
         }
-        
-        // se qualcosa è andato storto... 
-        // o email-password sbagliata
-        // o altri errori
-        // risendo alla pagina di login
-        if(user == null)
+        else
         {
-            try{
-                (new Security()).GoToLoginPage(request, response, request.getSession());
-            }
-            catch(ServletException serExc)
-            {
-                log("ServletException - Controller: "+serExc.toString());
-            }
-            catch(IOException ioexc)
-            {
-                log("IOException - Controller: "+ioexc.toString());
-            }
+            forward_to(request, response, "/login/user_profile.jsp");
         }
-                
+    }
+    
+    protected void registrazione(HttpServletRequest request, HttpServletResponse response, String email, String password)
+    {
+        Utente u = new Utente();
+        u.setEmail(email);
+        u.setCredito(0);
+        u.setPassword(password);
+        
+        boolean esito = dbm.CreaUtente(u);
+        
+        if(esito)
+        {
+            forward_to(request, response, "/login/user_profile.jsp");
+        }else
+        {
+            forward_to(request, response, "/registrazione.html");
+        }
+    }
+    
+    protected void forward_to(HttpServletRequest request, HttpServletResponse response,String url)
+    {
+        try{
+            request.getRequestDispatcher(url).forward(request, response);
+        }
+        catch(ServletException serExc)
+        {
+            log("ServletException - Controller: "+serExc.toString());
+        }
+        catch(IOException ioexc)
+        {
+            log("IOException - Controller: "+ioexc.toString());
+        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -133,11 +166,12 @@ public class Controller extends HttpServlet {
         @Override
     public void init() throws ServletException {
         super.init(); //To change body of generated methods, choose Tools | Templates.
+        
         try{
-            dbm = new Database.DBManager("jdbc:derby://localhost:1527/CineDB");
+            dbm = new DBManager("jdbc:derby://localhost:1527/CineDB");
         }
         catch(SQLException sqlex){
-            
+            log(sqlex.toString());
         }
     }
 
