@@ -73,7 +73,8 @@ public class Controller extends HttpServlet {
         // risendo alla pagina di login
         if(user == null)
         {
-            try{
+            forward_to(request, response, "/error.jsp");
+            /*try{
                 (new Security()).ErrorPage(request, response, request.getSession());
             }
             catch(ServletException serExc)
@@ -83,11 +84,12 @@ public class Controller extends HttpServlet {
             catch(IOException ioexc)
             {
                 log("IOException - Controller: "+ioexc.toString());
-            }
+            }*/
         }
         else
         {
-            forward_to(request, response, "/login/user_profile.jsp");
+            request.getSession().setAttribute("user", user);
+            forward_to(request, response, "/auth/user_profile.jsp");
         }
     }
     

@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<jsp:useBean id="user" scope="session" class="Bean.Utente" />
 <!DOCTYPE html>
 <html>
     <head>
@@ -12,6 +13,9 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <h1>Welcome Back!</h1>
+        <p>Email: <jsp:getProperty name="user" property="email" /></p>
+        <p>Credito: <jsp:getProperty name="user" property="credito" /></p>
+        <p>Ruolo: <jsp:getProperty name="user" property="ruolo" /></p>
     </body>
 </html>

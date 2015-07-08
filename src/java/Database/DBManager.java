@@ -153,7 +153,7 @@ public class DBManager implements Serializable {
             ps.setDouble(3, p.getPrezzo());
             ps.setInt(4, p.getPostoID());      
             ps.setTimestamp(5, dataTmp);
-            ps.executeQuery();
+            ps.executeUpdate();
             return true;  
        }catch(SQLException ex){
             return false;
@@ -165,7 +165,7 @@ public class DBManager implements Serializable {
         try{
             PreparedStatement ps = con.prepareStatement("DELETE * FROM prenotazione WHERE id_prenotazione = ?");
             ps.setInt(1, IDprenotazione);
-            ps.executeQuery();
+            ps.executeUpdate();
             return true;
         }catch(SQLException ex){
             return false;
@@ -177,7 +177,7 @@ public class DBManager implements Serializable {
         try{
             PreparedStatement ps = con.prepareStatement("DELETE * FROM utente WHERE id_utente = ?");
             ps.setInt(1, IDutente);
-            ps.executeQuery();
+            ps.executeUpdate();
             return true;
         }catch(SQLException ex){
             return false;
@@ -191,7 +191,7 @@ public class DBManager implements Serializable {
             ps.setInt(1,s.getIDfilm());
             ps.setTimestamp(2, new Timestamp(s.getOra().getTime()));
             ps.setInt(3, s.getIDfilm());
-            ps.executeQuery();
+            ps.executeUpdate();
             return true;
         }catch(SQLException ex){
             return false;
