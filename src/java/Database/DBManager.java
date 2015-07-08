@@ -52,7 +52,7 @@ public class DBManager implements Serializable {
     public Utente authenticate(String email, String password)
     {
         try{
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM utente,ruolo WHERE email = ? AND password = ? AND utente.id_ruolo = ruolo.id_ruolo");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM id_utente, utente,ruolo WHERE email = ? AND password = ? AND utente.id_ruolo = ruolo.id_ruolo");
 
             try
             {
@@ -64,6 +64,7 @@ public class DBManager implements Serializable {
                 try{
                     if (rs.next()) {
                         Utente user = new Utente();
+                        user.setUserID(rs.getInt("id_utente"));
                         user.setEmail(rs.getString("email"));
                         user.setCredito(rs.getDouble("credito"));
                         user.setRuolo(rs.getString("ruolo"));
@@ -88,7 +89,10 @@ public class DBManager implements Serializable {
     public List<Spettacolo> getSpettacoli(Date giornoOra) throws SQLException
     {
         List<Spettacolo> listSpettacoli = new ArrayList<Spettacolo>();
-        PreparedStatement ps = con.prepareStatement("SELECT titolo,url_trailer,url_locandina,durata,trama,data_ora,g.descrizione AS genere,sa.descrizione AS sala FROM spettacolo AS S,film AS F, genere AS G,sala AS SA WHERE S.id_film = F.id_film AND G.id_genere = F.id_genere AND S.id_sala = SA.id_sala AND data_ora >= ?");
+        PreparedStatement ps = con.prepareStatement(
+                "SELECT Sid_spettacolo,S.id_film, titolo,url_trailer,url_locandina,durata,trama,data_ora,g.descrizione AS genere,sa.descrizione AS sala"+
+                        "FROM spettacolo AS S,film AS F, genere AS G,sala AS SA "+
+                        "WHERE S.id_film = F.id_film AND G.id_genere = F.id_genere AND S.id_sala = SA.id_sala AND data_ora >= ?");
         
         //si, serve un timestamp o sql si lamenta
         java.sql.Timestamp dataTmp = new java.sql.Timestamp(giornoOra.getTime());
@@ -104,6 +108,8 @@ public class DBManager implements Serializable {
                 {
                     
                     Spettacolo spect = new Spettacolo();
+                    spect.setIDspettacolo(rs.getInt("id_spettacolo"));
+                    spect.setIDfilm(rs.getInt("id_film"));
                     spect.setDurata(rs.getInt("durata"));
                     spect.setTitolo(rs.getString("titolo"));
                     spect.setGenere(rs.getString("genere"));

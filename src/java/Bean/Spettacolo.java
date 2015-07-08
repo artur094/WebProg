@@ -23,6 +23,7 @@ public class Spettacolo {
     //i campi qui sotto forse vanno cancellati, attenzione perchè vengono usati nel dbManager
     private int IDfilm;
     private int IDsala;
+    private int IDspettacolo;
     
     
     public int getIDsala() {
@@ -115,5 +116,19 @@ public class Spettacolo {
 
     public void setUrlLocandina(String urlLocandina) {
         this.urlLocandina = urlLocandina;
+    }
+
+    /**
+     * @return the IDspettacolo
+     */
+    public int getIDspettacolo() {
+        return IDspettacolo;
+    }
+
+    /**
+     * @param IDspettacolo the IDspettacolo to set
+     */
+    public void setIDspettacolo(int IDspettacolo) {
+        this.IDspettacolo = IDspettacolo;
     }
 }
