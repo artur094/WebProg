@@ -11,7 +11,6 @@
 <%@page import="java.time.LocalDateTime"%>
 <%@page import="Bean.Spettacoli"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<jsp:useBean id="spettacoli" scope="session" class="Bean.Spettacoli" />
 <!DOCTYPE html>
 <html>
     <head>
@@ -19,9 +18,9 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <table>
+        <table border="1px solid black">
             <%
-                List<Spettacolo> lista = spettacoli.getSpettacoli(new Date());
+                List<Spettacolo> lista = (new Spettacoli()).getSpettacoli(new Date());
                 
                 Iterator<Spettacolo> it = lista.iterator();
                 

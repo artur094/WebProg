@@ -16,6 +16,16 @@ import java.util.List;
  */
 public class Spettacoli {
     DBManager dbm;
+    public Spettacoli()
+    {
+        try{
+            dbm = new DBManager("jdbc:derby://localhost:1527/CineDB");
+        }
+        catch(SQLException sqlex){
+            
+        }
+    }
+    
     public Spettacoli(DBManager dbm)
     {
         super();
@@ -25,7 +35,7 @@ public class Spettacoli {
     public List<Spettacolo> getSpettacoli(Date data)
             throws SQLException
     {
-        List<Spettacolo> lista;
+        List<Spettacolo> lista = null;
         
         lista = dbm.getSpettacoli(data);
         

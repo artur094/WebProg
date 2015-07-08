@@ -90,9 +90,9 @@ public class DBManager implements Serializable {
     {
         List<Spettacolo> listSpettacoli = new ArrayList<Spettacolo>();
         PreparedStatement ps = con.prepareStatement(
-                "SELECT Sid_spettacolo,S.id_film, titolo,url_trailer,url_locandina,durata,trama,data_ora,g.descrizione AS genere,sa.descrizione AS sala"+
-                        "FROM spettacolo AS S,film AS F, genere AS G,sala AS SA "+
-                        "WHERE S.id_film = F.id_film AND G.id_genere = F.id_genere AND S.id_sala = SA.id_sala AND data_ora >= ?");
+                "SELECT S.id_spettacolo, S.id_film, titolo ,url_trailer,url_locandina,durata,trama,data_ora,g.descrizione AS genere,sa.descrizione AS sala\n" +
+"                        FROM spettacolo AS S,film AS F, genere AS G,sala AS SA \n" +
+"                        WHERE S.id_film = F.id_film AND G.id_genere = F.id_genere AND S.id_sala = SA.id_sala AND data_ora >= ?");
         
         //si, serve un timestamp o sql si lamenta
         java.sql.Timestamp dataTmp = new java.sql.Timestamp(giornoOra.getTime());
