@@ -100,3 +100,17 @@ CREATE TABLE prenotazione
 
 insert into ruolo (ruolo) values ('admin');
 insert into ruolo (ruolo) values ('user');
+
+-- prova
+insert into genere (descrizione) values ('fantasy');
+insert into film (titolo, id_genere, url_trailer, durata, trama, url_locandina) values(
+        'Lord of the Rings: The Fellowship of the Ring',
+        1,
+        'https://www.youtube.com/watch?v=V75dMMIW2B4',
+        178,
+        'A meek hobbit of the Shire and eight companions set out on a journey to Mount Doom to destroy the One Ring and the dark lord Sauron.',
+        'http://www.imdb.com/title/tt0120737/');
+insert into sala (descrizione) values ('Sala con 50 posti a sedere');
+insert into spettacolo (id_film, data_ora, id_sala) values (1, '2015-08-10 21:30:00', 1);
+
+select * from spettacolo;
