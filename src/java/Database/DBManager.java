@@ -8,6 +8,7 @@ package Database;
 import Bean.Prenotazione;
 import Bean.Spettacolo;
 import Bean.Utente;
+import Bean.Film;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -52,7 +53,7 @@ public class DBManager implements Serializable {
     public Utente authenticate(String email, String password)
     {
         try{
-            PreparedStatement ps = con.prepareStatement("SELECT * FROM id_utente, utente,ruolo WHERE email = ? AND password = ? AND utente.id_ruolo = ruolo.id_ruolo");
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM utente,ruolo WHERE email = ? AND password = ? AND utente.id_ruolo = ruolo.id_ruolo");
 
             try
             {
@@ -131,6 +132,81 @@ public class DBManager implements Serializable {
         return listSpettacoli;
     }
     
+    public Film getFilm(int id_film) throws SQLException
+    {
+        Film f = null;
+        PreparedStatement ps = con.prepareStatement(
+                    "SELECT titolo, url_trailer,durata, trama, url_locandina,descrizione FROM film AS f, genere AS G WHERE f.id_genere = g.id_genere AND f.id_film = ?");
+        
+        try{
+            ps.setInt(1, id_film);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            try{
+                if(rs.next())
+                {
+                    f = new Film();
+                    f.setDurata(rs.getInt("durata"));
+                    f.setGenere(rs.getString("descrizione"));
+                    f.setId_film(id_film);
+                    f.setTitolo(rs.getString("titolo"));
+                    f.setTrama(rs.getString("trama"));
+                    f.setUrl_locandina(rs.getString("url_locandina"));
+                    f.setUrl_trailer(rs.getString("url_trailer"));
+                }
+            }
+            finally{
+                rs.close();
+            }
+            
+        }finally
+        {
+            ps.close();
+        }
+        return f;
+    }
+    
+    public Spettacolo getSpettacolo(int id_spettacolo) throws SQLException
+    {
+        Spettacolo spect = null;
+        PreparedStatement ps = con.prepareStatement(
+                    "SELECT S.id_spettacolo, S.id_film, titolo ,url_trailer,url_locandina,durata,trama,data_ora,g.descrizione AS genere,sa.descrizione AS sala\n" +
+"                        FROM spettacolo AS S,film AS F, genere AS G,sala AS SA \n" +
+"                        WHERE S.id_film = F.id_film AND G.id_genere = F.id_genere AND S.id_sala = SA.id_sala AND S.id_spettacolo = ?");
+        
+        try{
+            ps.setInt(1, id_spettacolo);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            try{
+                if(rs.next())
+                {
+                    spect = new Spettacolo();
+                    spect.setIDspettacolo(rs.getInt("id_spettacolo"));
+                    spect.setIDfilm(rs.getInt("id_film"));
+                    spect.setDurata(rs.getInt("durata"));
+                    spect.setTitolo(rs.getString("titolo"));
+                    spect.setGenere(rs.getString("genere"));
+                    spect.setTrama(rs.getString("trama"));
+                    spect.setUrlTrailer(rs.getString("url_trailer"));
+                    spect.setUrlLocandina(rs.getString("url_locandina"));
+                    spect.setOra(rs.getDate("data_ora"));
+                    spect.setSala(rs.getString("sala"));
+                }
+            }
+            finally{
+                rs.close();
+            }
+            
+        }finally
+        {
+            ps.close();
+        }
+        return spect;
+    }
+    
     //creazione utente
     
     public boolean CreaUtente(Utente u){
@@ -148,6 +224,7 @@ public class DBManager implements Serializable {
         }
     }
     
+    //da testare
     public boolean CreaPrenotazione(Prenotazione p){
        try{
             PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,?");
@@ -166,6 +243,7 @@ public class DBManager implements Serializable {
         }
     }
     
+    //da testare
     //cancellare prenozatione
     public boolean CancellaPrenotazione(int IDprenotazione){
         try{
@@ -178,6 +256,7 @@ public class DBManager implements Serializable {
         }
     }
     
+    //da testare
     //cancellare utente
     public boolean CancellaUtente(int IDutente){
         try{
@@ -190,6 +269,7 @@ public class DBManager implements Serializable {
         }     
     }
     
+    //da testare
     //creazione spettacoli
     public boolean CreaSpettacolo(Spettacolo s){
         try{

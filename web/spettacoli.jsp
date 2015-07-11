@@ -50,11 +50,11 @@
                     out.print("</td>");
                     
                     out.print("<td>");
-                    out.print("<a href='film?id="+s.getIDfilm()+"'>more info</a>");
+                    out.print("<a href='Controller?op=film&id="+s.getIDfilm()+"'>more info</a>");
                     out.print("</td>");
                     
                     out.print("<td>");
-                    out.print("<a href='prenota?id="+s.getIDspettacolo()+"'>prenota</a>");
+                    out.print("<a href='Controller?op=prenota&id="+s.getIDspettacolo()+"'>prenota</a>");
                     out.print("</td>");
                     
                     out.print("</tr>");

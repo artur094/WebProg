@@ -5,7 +5,9 @@
  */
 package Servlet;
 
+import Bean.Film;
 import Bean.Security;
+import Bean.Spettacolo;
 import Bean.Utente;
 import Database.DBManager;
 import java.io.IOException;
@@ -15,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 
 /**
  *
@@ -52,12 +55,68 @@ public class Controller extends HttpServlet {
             case "registrazione":
                 registrazione(request, response, email, pass);
                 break;
-            case "pren": break;
+            case "film":
+                int id_film = Integer.parseInt(request.getParameter("id"));
+                locandina_film(request, response, id_film);
+                break;
+            case "prenota":
+                prenotazione(request, response);
+                
+                break;
             case "admin": break;
             case "pay": break;
             default: break;
         }
         
+    }
+    
+    protected void prenotazione(HttpServletRequest request, HttpServletResponse response)
+    {
+        Utente user = (Utente)request.getSession().getAttribute("user");
+        int id_spettacolo = Integer.parseInt(request.getParameter("id"));
+        Spettacolo s = null;
+        
+         if(user == null)
+         {
+              forward_to(request, response, "/login.jsp");
+              return;
+         }
+           
+        
+        try
+        {
+            s = dbm.getSpettacolo(id_spettacolo);
+        }
+        catch(SQLException sqlex)
+        {
+            error(request, response);
+            return;
+        }
+        if(s == null)
+        {
+            error(request, response);
+            return;
+        }
+        
+        request.getSession().setAttribute("spettacolo", s);
+        forward_to(request, response, "/auth/prenotazione.jsp");
+    }
+    
+    protected void locandina_film(HttpServletRequest request, HttpServletResponse response, int id_film)
+    {
+        Film f = null;
+        
+        try{
+            f = dbm.getFilm(id_film);
+        }
+        catch(SQLException sqlex){
+            this.error(request, response);
+        }
+        if(f == null)
+            error(request, response);
+            
+        request.getSession().setAttribute("film", f);
+        forward_to(request, response, "/film.jsp");
     }
     
     protected void login(HttpServletRequest request, HttpServletResponse response, String email, String password)
@@ -124,6 +183,20 @@ public class Controller extends HttpServlet {
         {
             log("IOException - Controller: "+ioexc.toString());
         }
+    }
+    
+    protected void error(HttpServletRequest request, HttpServletResponse response)
+    {
+        try{
+                (new Security()).ErrorPage(request, response, request.getSession());
+            }catch(ServletException servex)
+            {
+                log(servex.toString());
+            }
+            catch(IOException iox)
+            {
+                log(iox.toString());
+            }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
