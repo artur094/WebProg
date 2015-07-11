@@ -158,11 +158,13 @@ public class Controller extends HttpServlet {
         u.setEmail(email);
         u.setCredito(0);
         u.setPassword(password);
+        u.setRuolo("user");
         
         boolean esito = dbm.CreaUtente(u);
         
         if(esito)
         {
+            request.getSession().setAttribute("user", u);
             forward_to(request, response, "/auth/user_profile.jsp");
         }else
         {
