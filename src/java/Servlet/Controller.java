@@ -163,7 +163,7 @@ public class Controller extends HttpServlet {
         
         if(esito)
         {
-            forward_to(request, response, "/login/user_profile.jsp");
+            forward_to(request, response, "/auth/user_profile.jsp");
         }else
         {
             forward_to(request, response, "/registrazione.html");
