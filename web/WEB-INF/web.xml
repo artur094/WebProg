@@ -8,6 +8,10 @@
         <servlet-name>Controller</servlet-name>
         <servlet-class>Servlet.Controller</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>GenQR</servlet-name>
+        <servlet-class>Servlet.GeneratoreQR</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>TestDBManager</servlet-name>
         <url-pattern>/src/java/Servlet/TestDBManager.java</url-pattern>
@@ -35,6 +39,10 @@
         <url-pattern>/auth/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
+    <servlet-mapping>
+        <servlet-name>GenQR</servlet-name>
+        <url-pattern>/GenQR</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

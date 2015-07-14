@@ -245,7 +245,7 @@ public class Controller extends HttpServlet {
         super.init(); //To change body of generated methods, choose Tools | Templates.
         
         try{
-            dbm = new DBManager("jdbc:derby://localhost:1527/CineDB");
+            dbm = new DBManager("jdbc:derby://localhost:1527/noPassword");
         }
         catch(SQLException sqlex){
             log(sqlex.toString());
