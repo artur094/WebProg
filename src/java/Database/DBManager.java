@@ -9,6 +9,7 @@ import Bean.Prenotazione;
 import Bean.Spettacolo;
 import Bean.Utente;
 import Bean.Film;
+import Bean.Posto;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -48,6 +49,54 @@ public class DBManager implements Serializable {
         } catch (SQLException ex) {
             Logger.getLogger(DBManager.class.getName()).info(ex.getMessage());
         }
+    }
+    
+    public boolean cancellaPrenotazioniVecchieNonPagate()
+    {
+        try{
+            PreparedStatement ps = con.prepareStatement("DELETE FROM prenotazione WHERE {fn TIMESTAMPDIFF(SQL_TSI_MINUTE, CURRENT_TIMESTAMP, DATA_ORA_OPERAZIONE)} > 15;");
+            ps.executeUpdate();
+            return true;
+        }catch(SQLException ex){
+            return false;
+        }
+    }
+    
+    public List<Posto> getPostiSala(int id_spettacolo)
+    {
+        List<Posto> posti = new ArrayList<>();
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT PRE.id_prenotazione, PRE.id_spettacolo, PO.riga, PO.colonna, PO.esiste FROM (posto as PO LEFT JOIN prenotazione as PRE ON PO.ID_POSTO = PRE.ID_POSTO), spettacolo as S WHERE PO.id_sala = S.id_sala AND PRE.id_sala = S.id_sala AND S.ID_SPETTACOLO = ?");
+            
+            try
+            {
+                ps.setInt(1, id_spettacolo);
+
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    while (rs.next()) {
+                        Posto p = new Posto();
+                        p.setIDPrenotazione(rs.getInt("id_prenotazione"));
+                        p.setIDsala(rs.getInt("id_spettacolo"));
+                        p.setEsiste(rs.getBoolean("esiste"));
+                        p.setRiga(rs.getInt("riga"));
+                        p.setColonna(rs.getInt("colonna"));
+                        posti.add(p);
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        }catch(SQLException sqlex)
+        {
+            return null;
+        }
+        
+        return posti;
     }
     
     public Utente authenticate(String email, String password)
@@ -208,7 +257,6 @@ public class DBManager implements Serializable {
     }
     
     //creazione utente
-    
     public boolean CreaUtente(Utente u){
         try{
             PreparedStatement ps = con.prepareStatement("INSERT INTO utente(email,password,credito,id_ruolo) VALUES (?,?,?,?)");
@@ -220,6 +268,23 @@ public class DBManager implements Serializable {
             ps.executeUpdate();
             return true;
         }catch(SQLException ex){
+            return false;
+        }
+    }
+    
+    //da testare
+    public boolean CreaPrenotazione(int user_id, int id_spettacolo, int id_prezzo,int id_posto){
+       try{
+            PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,CURRENT_TIMESTAMP");
+            
+            ps.setInt(1, user_id);
+            ps.setInt(2, id_spettacolo);
+            ps.setDouble(3, id_prezzo);
+            ps.setInt(4, id_posto);      
+
+            ps.executeUpdate();
+            return true;  
+       }catch(SQLException ex){
             return false;
         }
     }

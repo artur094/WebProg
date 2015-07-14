@@ -68,6 +68,7 @@ CREATE TABLE posto
     riga int,
     colonna int,
     esiste boolean,
+    pagato boolean,
     constraint posto_pk primary key (id_posto),
     constraint posto_sala foreign key (id_sala) references sala(id_sala)
 );
@@ -101,6 +102,12 @@ CREATE TABLE prenotazione
 insert into ruolo (ruolo) values ('admin');
 insert into ruolo (ruolo) values ('user');
 
+insert into prezzo(tipo, prezzo) values ("normale", 8);
+insert into prezzo(tipo, prezzo) values ("ridotto", 4);
+insert into prezzo(tipo, prezzo) values ("studente", 5);
+insert into prezzo(tipo, prezzo) values ("militare", 6);
+insert into prezzo(tipo, prezzo) values ("disabile", 5);
+
 -- prova
 insert into genere (descrizione) values ('fantasy');
 insert into film (titolo, id_genere, url_trailer, durata, trama, url_locandina) values(
@@ -112,5 +119,3 @@ insert into film (titolo, id_genere, url_trailer, durata, trama, url_locandina) 
         'http://www.imdb.com/title/tt0120737/');
 insert into sala (descrizione) values ('Sala con 50 posti a sedere');
 insert into spettacolo (id_film, data_ora, id_sala) values (1, '2015-08-10 21:30:00', 1);
-
-select * from spettacolo;

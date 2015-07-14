@@ -63,11 +63,19 @@ public class Controller extends HttpServlet {
                 prenotazione(request, response);
                 
                 break;
+            case "logout": break;
             case "admin": break;
             case "pay": break;
             default: break;
         }
         
+    }
+    
+    protected void logout(HttpServletRequest request, HttpServletResponse response)
+    {
+        request.getSession().setAttribute("user", null);
+        
+        forward_to(request, response, "/login.jsp");
     }
     
     protected void prenotazione(HttpServletRequest request, HttpServletResponse response)

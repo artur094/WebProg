@@ -10,27 +10,21 @@ package Bean;
  * @author Utente
  */
 public class Posto {
-    private int IDposto;
     private int IDsala;
+    private Integer IDPrenotazione;
     private int riga;
     private int colonna;
     private boolean esiste;
 
-    public Posto(int IDposto, int IDsala, int riga, int colonna, boolean esiste) {
-        this.IDposto = IDposto;
+    public Posto(int IDsala, int riga, int colonna, boolean esiste) {
         this.IDsala = IDsala;
         this.riga = riga;
         this.colonna = colonna;
         this.esiste = esiste;
     }
-
-    public int getIDposto() {
-        return IDposto;
-    }
-
-    public void setIDposto(int IDposto) {
-        this.IDposto = IDposto;
-    }
+    
+    public Posto()
+    {}
 
     public int getIDsala() {
         return IDsala;
@@ -38,6 +32,14 @@ public class Posto {
 
     public void setIDsala(int IDsala) {
         this.IDsala = IDsala;
+    }
+    
+    public Integer getIDPrenotazione() {
+        return IDPrenotazione;
+    }
+
+    public void setIDPrenotazione(Integer IDPrenotazione) {
+        this.IDPrenotazione = IDPrenotazione;
     }
 
     public int getRiga() {

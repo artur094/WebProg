@@ -13,5 +13,6 @@
     </head>
     <body>
         <h1>Prenotazione!</h1>
+        <!-- selezionare id_film, id_spettacolo, id_sala da inviare al controller -->
     </body>
 </html>
