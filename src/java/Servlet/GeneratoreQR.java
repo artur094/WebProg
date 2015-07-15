@@ -46,6 +46,8 @@ public class GeneratoreQR extends HttpServlet {
             throws ServletException, IOException {
         
         String testo = request.getParameter("testoQR");
+        String dest = request.getParameter("destinatario");
+        
         ByteArrayOutputStream outputStream = QRCode.from(testo).to(ImageType.PNG).stream(); //from indica la stringa sorgente, to indifca il formato di destinazione
         
         response.setContentType("image/png");
@@ -59,7 +61,8 @@ public class GeneratoreQR extends HttpServlet {
         pageStream.close();
         
         //codice per testare anche l'invio di email. Andiamo, è più comodo nella stessa pagina, lo sapete tutti
-        Email testE = new Email();
+        //Email testE = new Email("serverEmail","hostEmail",dest,"mittente",outputStream.toString());
+        //testE.Invia();
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
