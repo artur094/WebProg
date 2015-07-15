@@ -46,22 +46,28 @@ public class AdminFilter implements Filter {
         // the rest of the filter chain is invoked.
 	// For example, a logging filter might log items on the request object,
         // such as the parameters.
-	/*
-         for (Enumeration en = request.getParameterNames(); en.hasMoreElements(); ) {
-         String name = (String)en.nextElement();
-         String values[] = request.getParameterValues(name);
-         int n = values.length;
-         StringBuffer buf = new StringBuffer();
-         buf.append(name);
-         buf.append("=");
-         for(int i=0; i < n; i++) {
-         buf.append(values[i]);
-         if (i < n-1)
-         buf.append(",");
-         }
-         log(buf.toString());
-         }
-         */
+	// reperisco il beans
+        Utente user = (Utente)((HttpServletRequest)request).getSession().getAttribute("user");
+        
+        // controllo se non ha effettuato il login
+        // non dovrebbe succedere, ma per sicurezza
+        if(user == null)
+        {
+            // Inoltro alla pagina di login
+            (new Security()).UnauthorizedPage(
+                    (HttpServletRequest) request, 
+                    (HttpServletResponse) response,
+                    ((HttpServletRequest)request).getSession());
+            
+        }
+        else if(!user.getRuolo().equals("admin"))
+        {
+            // Inoltro alla pagina di errore, dato che non può accedere perchè non ha i privilegi
+            (new Security()).UnauthorizedAdminPage(
+                    (HttpServletRequest) request, 
+                    (HttpServletResponse) response,
+                    ((HttpServletRequest)request).getSession());
+        }
     }    
     
     private void doAfterProcessing(ServletRequest request, ServletResponse response)
@@ -108,28 +114,6 @@ public class AdminFilter implements Filter {
         
         doBeforeProcessing(request, response);
         
-        // reperisco il beans
-        Utente user = (Utente)((HttpServletRequest)request).getSession().getAttribute("userBean");
-        
-        // controllo se non ha effettuato il login
-        // non dovrebbe succedere, ma per sicurezza
-        if(user == null)
-        {
-            // Inoltro alla pagina di login
-            (new Security()).UnauthorizedPage(
-                    (HttpServletRequest) request, 
-                    (HttpServletResponse) response,
-                    ((HttpServletRequest)request).getSession());
-        }
-        
-        if(user.getRuolo().equals("admin"))
-        {
-            // Inoltro alla pagina di errore, dato che non può accedere perchè non ha i privilegi
-            (new Security()).UnauthorizedAdminPage(
-                    (HttpServletRequest) request, 
-                    (HttpServletResponse) response,
-                    ((HttpServletRequest)request).getSession());
-        }
         
         Throwable problem = null;
         try {

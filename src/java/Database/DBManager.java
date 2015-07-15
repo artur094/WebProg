@@ -66,7 +66,7 @@ public class DBManager implements Serializable {
     {
         List<Posto> posti = new ArrayList<>();
         try{
-            PreparedStatement ps = con.prepareStatement("SELECT PRE.id_prenotazione, PRE.id_spettacolo, PO.riga, PO.colonna, PO.esiste FROM (posto as PO LEFT JOIN prenotazione as PRE ON PO.ID_POSTO = PRE.ID_POSTO), spettacolo as S WHERE PO.id_sala = S.id_sala AND PRE.id_sala = S.id_sala AND S.ID_SPETTACOLO = ?");
+            PreparedStatement ps = con.prepareStatement("SELECT PRE.id_prenotazione, PRE.id_spettacolo,PO.id_posto, PO.riga, PO.colonna,PO.pagato, PO.esiste FROM (posto as PO LEFT JOIN prenotazione as PRE ON PO.ID_POSTO = PRE.ID_POSTO), spettacolo as S WHERE PO.id_sala = S.id_sala AND PRE.id_sala = S.id_sala AND S.ID_SPETTACOLO = ?");
             
             try
             {
@@ -77,9 +77,11 @@ public class DBManager implements Serializable {
                 try{
                     while (rs.next()) {
                         Posto p = new Posto();
+                        p.setIDposto(rs.getInt("id_posto"));
                         p.setIDPrenotazione(rs.getInt("id_prenotazione"));
                         p.setIDsala(rs.getInt("id_spettacolo"));
                         p.setEsiste(rs.getBoolean("esiste"));
+                        p.setPagato(rs.getBoolean("pagato"));
                         p.setRiga(rs.getInt("riga"));
                         p.setColonna(rs.getInt("colonna"));
                         posti.add(p);
@@ -216,6 +218,42 @@ public class DBManager implements Serializable {
         return f;
     }
     
+    public List<Film> getFilms() throws SQLException
+    {
+        List<Film> lista = new ArrayList<Film>();
+        PreparedStatement ps = con.prepareStatement(
+                "SELECT id_film, titolo, url_trailer,durata, trama, url_locandina,descrizione FROM film AS f, genere AS G WHERE f.id_genere = g.id_genere");
+  
+        
+        try
+        {
+            ResultSet rs = ps.executeQuery();
+            
+            try{
+                while(rs.next())
+                {
+                    
+                    Film f = new Film();
+                    f.setDurata(rs.getInt("durata"));
+                    f.setGenere(rs.getString("descrizione"));
+                    f.setId_film(rs.getInt("id_film"));
+                    f.setTitolo(rs.getString("titolo"));
+                    f.setTrama(rs.getString("trama"));
+                    f.setUrl_locandina(rs.getString("url_locandina"));
+                    f.setUrl_trailer(rs.getString("url_trailer"));
+                    lista.add(f);
+                }
+                
+            }finally{
+                rs.close();
+            }
+        }finally{
+            ps.close();
+        }
+        
+        return lista;
+    }
+    
     public Spettacolo getSpettacolo(int id_spettacolo) throws SQLException
     {
         Spettacolo spect = null;
@@ -273,20 +311,26 @@ public class DBManager implements Serializable {
     }
     
     //da testare
-    public boolean CreaPrenotazione(int user_id, int id_spettacolo, int id_prezzo,int id_posto){
+    public boolean CreaPrenotazione(int user_id, int id_spettacolo, int id_prezzo,int id_posto, boolean pagato){
        try{
-            PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,CURRENT_TIMESTAMP");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione, pagato) VALUES (?,?,?,?,CURRENT_TIMESTAMP, ?");
             
             ps.setInt(1, user_id);
             ps.setInt(2, id_spettacolo);
             ps.setDouble(3, id_prezzo);
-            ps.setInt(4, id_posto);      
+            ps.setInt(4, id_posto); 
+            ps.setBoolean(5, pagato);
 
             ps.executeUpdate();
             return true;  
        }catch(SQLException ex){
             return false;
         }
+    }
+    //DAFINIRE
+    public boolean Paga()
+    {
+        return false;
     }
     
     //da testare

@@ -2,6 +2,9 @@
 insert into ruolo (ruolo) values ('admin');
 insert into ruolo (ruolo) values ('user');
 
+--admin
+insert into utente (email, password, credito, id_ruolo) values ('admin@cineland.it', 'admin', 0, 1);
+
 --generi
 insert into genere (descrizione) values ('fantasy');
 insert into genere (descrizione) values ('drammatico');
@@ -15,6 +18,10 @@ insert into prezzo(tipo, prezzo) values ("militare", 6);
 insert into prezzo(tipo, prezzo) values ("disabile", 5);
 
 --sala
+insert into sala(descrizione) values ('Sala Piscina');
+insert into sala(descrizione) values ('Sala Parcheggio');
+insert into sala(descrizione) values ('Sala Cuori');
+insert into sala(descrizione) values ('Sala Nerd');
 
 --film
 insert into film(titolo, id_genere, url_trailer, durata, trama, url_locandina) values

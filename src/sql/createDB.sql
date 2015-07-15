@@ -91,6 +91,7 @@ CREATE TABLE prenotazione
     id_spettacolo int,
     id_prezzo int,
     id_posto int,
+    pagato boolean DEFAULT false,
     data_ora_operazione timestamp,
     constraint prenotazione_pk primary key (id_prenotazione),
     constraint prenotazione_utente_fk foreign key (id_utente) references utente(id_utente),

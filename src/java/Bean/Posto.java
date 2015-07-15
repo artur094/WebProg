@@ -11,20 +11,40 @@ package Bean;
  */
 public class Posto {
     private int IDsala;
+    private int IDposto;
     private Integer IDPrenotazione;
     private int riga;
     private int colonna;
     private boolean esiste;
+    private boolean pagato;
 
-    public Posto(int IDsala, int riga, int colonna, boolean esiste) {
+    public Posto(int IDsala,int IDposto, int riga, int colonna, boolean esiste, boolean pagato) {
         this.IDsala = IDsala;
+        this.IDposto = IDposto;
         this.riga = riga;
         this.colonna = colonna;
         this.esiste = esiste;
+        this.pagato = pagato;
     }
     
     public Posto()
     {}
+    
+    public int getIDposto() {
+        return IDposto;
+    }
+
+    public void setIDposto(int IDposto) {
+        this.IDposto = IDposto;
+    }
+    
+    public boolean isPagato() {
+        return pagato;
+    }
+
+    public void setPagato(boolean pagato) {
+        this.pagato = pagato;
+    }
 
     public int getIDsala() {
         return IDsala;

@@ -15,9 +15,10 @@ import java.util.List;
 
 /*
 
-    O -> ESISTE (NON PRENOTATO)
-    - -> NON ESISTE
-    X -> PRENOTATO
+    0 -> ESISTE e LIBERO
+    1 -> PRENOTATO NON PAGATO
+    2 -> PRENOTATO e PAGATO
+    3 -> NON ESISTE
 */
 public class Sala {
     private int id_sala;
@@ -37,12 +38,14 @@ public class Sala {
             int y = posti.get(i).getColonna();
             
             if(posti.get(x).isEsiste())
-                mappa[x][y] = "O";
+                mappa[x][y] = "0";
             else
-                mappa[x][y] = "-";
+                mappa[x][y] = "3";
             
             if(posti.get(x).getIDPrenotazione() != null)
-                mappa[x][y] = "X";  
+                mappa[x][y] = "2";  
+            if(posti.get(x).isPagato())
+                mappa[x][y] = "1";
         }
     }
     
@@ -75,6 +78,9 @@ public class Sala {
         for (int i = 0; i < max_righe; i++) {
             for (int j = 0; j < max_colonne; j++) {
                 s+=mappa[i][j];
+                
+                if(j<max_colonne-1)
+                    s+=",";
             }
             s+="\n";
         }
