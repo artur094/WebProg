@@ -6,6 +6,7 @@
 package Bean;
 
 import Database.DBManager;
+import Servlet.Controller;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -19,7 +20,7 @@ public class Spettacoli {
     public Spettacoli()
     {
         try{
-            dbm = new DBManager("jdbc:derby://localhost:1527/CineDB");
+            dbm = new DBManager(Controller.URL_DB);
         }
         catch(SQLException sqlex){
             

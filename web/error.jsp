@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page isErrorPage="true" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -13,5 +14,6 @@
     </head>
     <body>
         <h1>ERROR!</h1>
+        <%=exception.toString()%>
     </body>
 </html>

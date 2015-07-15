@@ -5,6 +5,10 @@
  */
 package Bean;
 
+import Database.DBManager;
+import Servlet.Controller;
+import java.sql.SQLException;
+
 /**
  *
  * @author ivanmorandi
@@ -20,6 +24,20 @@ public class Film {
     private String url_locandina;
     
     public Film(){}
+    
+    public static Film getFilmfromDB(int id_film)
+    {
+        Film f = null;
+        try{
+            DBManager dbm = new DBManager(Controller.URL_DB);
+            f = dbm.getFilm(id_film);
+        }
+        catch(SQLException sqlex)
+        {
+            
+        }
+        return f;
+    }
     
     
     public int getId_film() {

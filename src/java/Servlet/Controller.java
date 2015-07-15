@@ -25,6 +25,8 @@ import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
  */
 public class Controller extends HttpServlet {
 
+    public static final String URL_DB = "jdbc:derby://localhost:1527/CineDB";
+    
     DBManager dbm;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -253,7 +255,7 @@ public class Controller extends HttpServlet {
         super.init(); //To change body of generated methods, choose Tools | Templates.
         
         try{
-            dbm = new DBManager("jdbc:derby://localhost:1527/CineDB");
+            dbm = new DBManager(URL_DB);
         }
         catch(SQLException sqlex){
             log(sqlex.toString());
