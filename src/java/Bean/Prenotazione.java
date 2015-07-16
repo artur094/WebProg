@@ -24,6 +24,7 @@ public class Prenotazione {
         this.spettacoloID = spettacoloID;
         this.prezzo = prezzoID;
         this.postoID = postoID;
+        this.dataOraOperazione =new Date();
     }
 
     public int getPrenotazioneID() {
