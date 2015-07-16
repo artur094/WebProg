@@ -6,6 +6,7 @@
 package Servlet;
 
 import Bean.Film;
+import Bean.Prenotazione;
 import Bean.Security;
 import Bean.Spettacolo;
 import Bean.Utente;
@@ -74,6 +75,8 @@ public class Controller extends HttpServlet {
     {
         Utente user = (Utente)request.getSession().getAttribute("user");
         int id_spettacolo = Integer.parseInt(request.getParameter("id"));
+        int id_posto = Integer.parseInt(request.getParameter("id_posto"));
+        int id_prezzo = Integer.parseInt(request.getParameter("id_prezzo"));
         Spettacolo s = null;
         
          if(user == null)
@@ -85,6 +88,7 @@ public class Controller extends HttpServlet {
         
         try
         {
+            //controllo che quello spettacolo esista
             s = dbm.getSpettacolo(id_spettacolo);
         }
         catch(SQLException sqlex)
@@ -98,7 +102,16 @@ public class Controller extends HttpServlet {
             return;
         }
         
+        Prenotazione p = new Prenotazione(user,id_spettacolo,id_prezzo,id_posto);
+        
+        if(!dbm.InserisciPrenotazione(p)){
+            //inserimento prenotazione non è andato a buon fine
+            error(request,response);
+        }
+        
+        request.getSession().setAttribute("prenotazione",p);
         request.getSession().setAttribute("spettacolo", s);
+        
         forward_to(request, response, "/auth/prenotazione.jsp");
     }
     
@@ -116,6 +129,7 @@ public class Controller extends HttpServlet {
             error(request, response);
             
         request.getSession().setAttribute("film", f);
+        request.getSession().setAttribute("IDFilm", id_film);
         forward_to(request, response, "/film.jsp");
     }
     

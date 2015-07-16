@@ -225,7 +225,7 @@ public class DBManager implements Serializable {
     }
     
     //da testare
-    public boolean CreaPrenotazione(Prenotazione p){
+    public boolean InserisciPrenotazione(Prenotazione p){
        try{
             PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,?");
             
