@@ -66,7 +66,7 @@ public class DBManager implements Serializable {
     {
         List<Posto> posti = new ArrayList<>();
         try{
-            PreparedStatement ps = con.prepareStatement("SELECT PRE.id_prenotazione, PRE.id_spettacolo,PO.id_posto, PO.riga, PO.colonna,PO.pagato, PO.esiste FROM (posto as PO LEFT JOIN prenotazione as PRE ON PO.ID_POSTO = PRE.ID_POSTO), spettacolo as S WHERE PO.id_sala = S.id_sala AND PO.id_sala = S.id_sala AND S.ID_SPETTACOLO = ?");
+            PreparedStatement ps = con.prepareStatement("SELECT PRE.id_prenotazione, PRE.id_spettacolo,PO.id_posto, PO.riga, PO.colonna,PRE.pagato, PO.esiste FROM (posto as PO LEFT JOIN prenotazione as PRE ON PO.ID_POSTO = PRE.ID_POSTO), spettacolo as S WHERE PO.id_sala = S.id_sala AND PO.id_sala = S.id_sala AND S.ID_SPETTACOLO = ?");
             
             try
             {
@@ -77,8 +77,12 @@ public class DBManager implements Serializable {
                 try{
                     while (rs.next()) {
                         Posto p = new Posto();
+                       
                         p.setIDposto(rs.getInt("id_posto"));
-                        p.setIDPrenotazione(rs.getInt("id_prenotazione"));
+                        if(rs.getObject("id_prenotazione") == null)
+                            p.setIDPrenotazione(-1);
+                        else
+                            p.setIDPrenotazione(rs.getInt("id_prenotazione"));
                         p.setIDsala(rs.getInt("id_spettacolo"));
                         p.setEsiste(rs.getBoolean("esiste"));
                         p.setPagato(rs.getBoolean("pagato"));
@@ -345,7 +349,7 @@ public class DBManager implements Serializable {
             
             ps.setInt(1, p.getUtente().getUserID());
             ps.setInt(2, p.getSpettacoloID());
-            ps.setDouble(3, p.getPrezzo());
+            ps.setInt(3, p.getPrezzo());
             ps.setInt(4, p.getPostoID());      
             ps.setTimestamp(5, dataTmp);
             ps.executeUpdate();
@@ -353,6 +357,62 @@ public class DBManager implements Serializable {
        }catch(SQLException ex){
             return false;
         }
+    }
+    
+    public boolean AggiungiPrenotazione(int id_utente, Spettacolo s, String prezzo, Posto p){
+       try{
+            PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,CURRENT_TIMESTAMP)");
+            
+            
+            ps.setInt(1, id_utente);
+            ps.setInt(2, s.getIDspettacolo());
+            ps.setInt(3, getIDPrezzo(prezzo));
+            ps.setInt(4, p.getIDposto());      
+            ps.executeUpdate();
+            return true;  
+       }catch(SQLException ex){
+            return false;
+        }
+    }
+    
+    public List<Prenotazione> prenotazioniNonPagate(Utente u)
+    {
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT id_prenotazione, id_spettacolo, id_prezzo, id_posto, data_ora_operazione FROM prenotazione WHERE id_utente = ? AND pagato = false;");
+            
+            ps.setInt(1, u.getUserID());
+            
+            ResultSet rs = ps.executeQuery();
+            
+            while(rs.next())
+            {
+                Prenotazione p = new Prenotazione();
+                p.setUtente(u);
+                p.setPrenotazioneID(rs.getInt("id_prenotazione"));
+                p.setSpettacoloID(rs.getInt("id_spettacolo"));
+                p.setPrezzo(rs.getInt("id_prezzo"));
+                //p.setDataOraOperazione(Date.parse(rs.getTimestamp("data_ora_prenotazione").toString()));
+            }
+            
+        }catch(SQLException ex)
+        {
+            return null;
+        }
+        
+        return null;
+    }
+    
+    public int getIDPrezzo(String prezzo) throws SQLException
+    {
+        PreparedStatement ps = con.prepareStatement("SELECT id_prezzo FROM prezzo WHERE tipo = ?");
+        ps.setString(1, prezzo);
+        ResultSet rs = ps.executeQuery();
+        
+        if(rs.next())
+        {
+            return rs.getInt("id_sala");
+        }
+        else return -1;
     }
     
     //da testare
@@ -484,7 +544,7 @@ public class DBManager implements Serializable {
                     PreparedStatement ps = con.prepareStatement("INSERT INTO posto(riga,colonna,esiste, id_sala) VALUES (?,?,?,?)");
                     ps.setInt(1,i);
                     ps.setInt(2, j);
-                    ps.setBoolean(3, false);
+                    ps.setBoolean(3, true);
                     ps.setInt(4, id_sala);
                     ps.executeUpdate();
                 }

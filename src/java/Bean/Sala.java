@@ -22,11 +22,20 @@ import java.util.List;
 */
 public class Sala {
     private int id_sala;
+    private int id_spettacolo;
     private int max_righe;
     private int max_colonne;
     private String[][] mappa;
+    private DBManager dbm;
     
     public Sala(DBManager dbm, int id_spettacolo)
+    {
+        this.dbm = dbm;
+        this.id_spettacolo = id_spettacolo;
+        refreshMappa();
+    }
+    
+    public void refreshMappa()
     {
         dbm.cancellaPrenotazioniVecchieNonPagate();
         List<Posto> posti = dbm.getPostiSala(id_spettacolo);
@@ -37,15 +46,15 @@ public class Sala {
             int x = posti.get(i).getRiga();
             int y = posti.get(i).getColonna();
             
-            if(posti.get(x).isEsiste())
-                mappa[x][y] = "0";
-            else
-                mappa[x][y] = "3";
-            
-            if(posti.get(x).getIDPrenotazione() != null)
+            mappa[x][y] = "0";
+
+            if(posti.get(x).getIDPrenotazione() > 0)
                 mappa[x][y] = "2";  
             if(posti.get(x).isPagato())
                 mappa[x][y] = "1";
+            
+            if(!posti.get(x).isEsiste())
+                mappa[x][y] = "3";
         }
     }
     
@@ -88,4 +97,28 @@ public class Sala {
         }
         return s;
     } 
+    
+    public int getId_sala() {
+        return id_sala;
+    }
+
+    public void setId_sala(int id_sala) {
+        this.id_sala = id_sala;
+    }
+
+    public int getMax_righe() {
+        return max_righe;
+    }
+
+    public void setMax_righe(int max_righe) {
+        this.max_righe = max_righe;
+    }
+
+    public int getMax_colonne() {
+        return max_colonne;
+    }
+
+    public void setMax_colonne(int max_colonne) {
+        this.max_colonne = max_colonne;
+    }
 }

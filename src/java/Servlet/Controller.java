@@ -6,6 +6,7 @@
 package Servlet;
 
 import Bean.Film;
+import Bean.Posto;
 import Bean.Sala;
 import Bean.Security;
 import Bean.Spettacolo;
@@ -17,7 +18,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -67,8 +70,11 @@ public class Controller extends HttpServlet {
                 int id_film = Integer.parseInt(request.getParameter("id"));
                 locandina_film(request, response, id_film);
                 break;
+            case "gotoprenota":
+                gotoprenotazione(request, response);
+                break;
             case "prenota":
-                prenotazione(request, response);
+                
                 break;
             case "add_spettacolo":
                 Utente user = (Utente)(request.getSession().getAttribute("user"));
@@ -93,6 +99,51 @@ public class Controller extends HttpServlet {
         }
         
     }
+    
+    protected void prenotazione(HttpServletRequest request, HttpServletResponse response)
+    {
+        int n_normali = Integer.parseInt(request.getParameter("normale"));
+        int n_studenti = Integer.parseInt(request.getParameter("studente"));
+        int n_ridotti = Integer.parseInt(request.getParameter("ridotto"));
+        int n_militari = Integer.parseInt(request.getParameter("militare"));
+        int n_disabili = Integer.parseInt(request.getParameter("disabile"));
+        
+        Sala sala = (Sala)(request.getSession().getAttribute("sala"));
+        Spettacolo s = (Spettacolo)(request.getSession().getAttribute("spettacolo"));
+        Utente u = (Utente)(request.getSession().getAttribute("user"));
+        List<Posto> lista = new ArrayList<Posto>();
+        
+        int max_r = sala.getMax_righe();
+        int max_c = sala.getMax_colonne();
+        
+        for (int i = 0; i < max_r; i++) {
+            for (int j = 0; j < max_c; j++) {
+                if(request.getParameter(i+","+j) != null)
+                {
+                    Posto p = new Posto();
+                    p.setIDsala(s.getIDsala());
+                    p.setRiga(i);
+                    p.setColonna(j);
+                    p.setEsiste(true);
+                    p.setPagato(false);
+                    
+                    String prezzo = "normale";
+                    if(n_studenti > 0)
+                        prezzo = "studente";
+                    else if(n_ridotti > 0)
+                        prezzo ="ridotto";
+                    else if(n_militari > 0)
+                        prezzo ="militare";
+                    else if(n_disabili>0)
+                        prezzo = "disabile";
+                    
+                    dbm.AggiungiPrenotazione(u.getUserID(), s, prezzo, p);
+                }
+            }
+        }
+    }
+    
+    
     
     protected void addSpettacolo(HttpServletRequest request, HttpServletResponse response)
     {
@@ -122,7 +173,7 @@ public class Controller extends HttpServlet {
         forward_to(request, response, "/login.jsp");
     }
     
-    protected void prenotazione(HttpServletRequest request, HttpServletResponse response)
+    protected void gotoprenotazione(HttpServletRequest request, HttpServletResponse response)
     {
         int id_spettacolo = Integer.parseInt(request.getParameter("id"));
         Spettacolo s = null;
@@ -144,6 +195,7 @@ public class Controller extends HttpServlet {
         request.getSession().setAttribute("sala", sala);
         forward_to(request, response, "/prenotazione.jsp");
     }
+    
     
     protected void locandina_film(HttpServletRequest request, HttpServletResponse response, int id_film)
     {

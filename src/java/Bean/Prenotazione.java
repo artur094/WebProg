@@ -15,14 +15,16 @@ public class Prenotazione {
     private int prenotazioneID;
     private Utente utente;
     private int spettacoloID;
-    private double prezzo;
+    private int IDprezzo;
     private int postoID;
     private Date dataOraOperazione;
+    
+    public Prenotazione(){}
 
     public Prenotazione(Utente utente, int spettacoloID, int prezzoID, int postoID) {
         this.utente = utente;
         this.spettacoloID = spettacoloID;
-        this.prezzo = prezzoID;
+        this.IDprezzo = prezzoID;
         this.postoID = postoID;
     }
 
@@ -50,12 +52,12 @@ public class Prenotazione {
         this.spettacoloID = spettacoloID;
     }
 
-    public double getPrezzo() {
-        return prezzo;
+    public int getPrezzo() {
+        return IDprezzo;
     }
 
-    public void setPrezzo(double prezzoID) {
-        this.prezzo = prezzoID;
+    public void setPrezzo(int prezzoID) {
+        this.IDprezzo = prezzoID;
     }
 
     public int getPostoID() {

@@ -11,11 +11,11 @@ insert into genere (descrizione) values ('drammatico');
 insert into genere (descrizione) values ('fantascienza');
 
 --tipi di prezzo
-insert into prezzo(tipo, prezzo) values ("normale", 8);
-insert into prezzo(tipo, prezzo) values ("ridotto", 4);
-insert into prezzo(tipo, prezzo) values ("studente", 5);
-insert into prezzo(tipo, prezzo) values ("militare", 6);
-insert into prezzo(tipo, prezzo) values ("disabile", 5);
+insert into prezzo(tipo, prezzo) values ('normale', 8);
+insert into prezzo(tipo, prezzo) values ('ridotto', 4);
+insert into prezzo(tipo, prezzo) values ('studente', 5);
+insert into prezzo(tipo, prezzo) values ('militare', 6);
+insert into prezzo(tipo, prezzo) values ('disabile', 5);
 
 --sala
 insert into sala(descrizione) values ('Sala Piscina');

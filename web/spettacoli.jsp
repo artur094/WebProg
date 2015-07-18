@@ -54,7 +54,7 @@
                     out.print("</td>");
                     
                     out.print("<td>");
-                    out.print("<a href='Controller?op=prenota&id="+s.getIDspettacolo()+"'>prenota</a>");
+                    out.print("<a href='Controller?op=gotoprenota&id="+s.getIDspettacolo()+"'>prenota</a>");
                     out.print("</td>");
                     
                     out.print("</tr>");

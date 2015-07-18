@@ -68,7 +68,6 @@ CREATE TABLE posto
     riga int,
     colonna int,
     esiste boolean,
-    pagato boolean,
     constraint posto_pk primary key (id_posto),
     constraint posto_sala foreign key (id_sala) references sala(id_sala)
 );
