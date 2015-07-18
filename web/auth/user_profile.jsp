@@ -25,5 +25,8 @@
             }
             
             %>
+            <p>
+            <a href="Controller?op=logout">Logout</a>
+            </p>
     </body>
 </html>

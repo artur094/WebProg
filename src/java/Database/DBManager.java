@@ -66,7 +66,7 @@ public class DBManager implements Serializable {
     {
         List<Posto> posti = new ArrayList<>();
         try{
-            PreparedStatement ps = con.prepareStatement("SELECT PRE.id_prenotazione, PRE.id_spettacolo,PO.id_posto, PO.riga, PO.colonna,PRE.pagato, PO.esiste FROM (posto as PO LEFT JOIN prenotazione as PRE ON PO.ID_POSTO = PRE.ID_POSTO), spettacolo as S WHERE PO.id_sala = S.id_sala AND PO.id_sala = S.id_sala AND S.ID_SPETTACOLO = ?");
+            PreparedStatement ps = con.prepareStatement("SELECT PRE.id_prenotazione, PRE.id_spettacolo,PO.id_posto, PO.riga, PO.colonna,PRE.pagato, PO.esiste FROM (posto as PO inner JOIN prenotazione as PRE ON PO.ID_POSTO = PRE.ID_POSTO), spettacolo as S WHERE PO.id_sala = S.id_sala AND PO.id_sala = S.id_sala AND S.ID_SPETTACOLO = ?");
             
             try
             {
@@ -359,14 +359,13 @@ public class DBManager implements Serializable {
         }
     }
     
-    public boolean AggiungiPrenotazione(int id_utente, Spettacolo s, String prezzo, Posto p){
+    public boolean AggiungiPrenotazione(int id_utente, Spettacolo s, int id_prezzo, Posto p){
        try{
             PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,CURRENT_TIMESTAMP)");
             
-            
             ps.setInt(1, id_utente);
             ps.setInt(2, s.getIDspettacolo());
-            ps.setInt(3, getIDPrezzo(prezzo));
+            ps.setInt(3, id_prezzo);
             ps.setInt(4, p.getIDposto());      
             ps.executeUpdate();
             return true;  
@@ -377,6 +376,7 @@ public class DBManager implements Serializable {
     
     public List<Prenotazione> prenotazioniNonPagate(Utente u)
     {
+        List<Prenotazione> prenotazioni = new ArrayList<Prenotazione>();
         try{
             PreparedStatement ps = con.prepareStatement("SELECT id_prenotazione, id_spettacolo, id_prezzo, id_posto, data_ora_operazione FROM prenotazione WHERE id_utente = ? AND pagato = false;");
             
@@ -391,7 +391,10 @@ public class DBManager implements Serializable {
                 p.setPrenotazioneID(rs.getInt("id_prenotazione"));
                 p.setSpettacoloID(rs.getInt("id_spettacolo"));
                 p.setPrezzo(rs.getInt("id_prezzo"));
-                //p.setDataOraOperazione(Date.parse(rs.getTimestamp("data_ora_prenotazione").toString()));
+                p.setPostoID(rs.getInt("id_posto"));
+                p.setDataOraOperazione(new Date(rs.getTimestamp("data_ora_prenotazione").getTime()));
+                
+                prenotazioni.add(p);
             }
             
         }catch(SQLException ex)
@@ -399,13 +402,29 @@ public class DBManager implements Serializable {
             return null;
         }
         
-        return null;
+        return prenotazioni;
     }
     
     public int getIDPrezzo(String prezzo) throws SQLException
     {
         PreparedStatement ps = con.prepareStatement("SELECT id_prezzo FROM prezzo WHERE tipo = ?");
         ps.setString(1, prezzo);
+        ResultSet rs = ps.executeQuery();
+        
+        if(rs.next())
+        {
+            return rs.getInt("id_sala");
+        }
+        else return -1;
+    }
+    
+    public int getIDPosto(int id_sala, int i, int j) throws SQLException
+    {
+        PreparedStatement ps = con.prepareStatement("SELECT id_posto FROM posto WHERE id_sala = ? AND riga = ? AND colonna =?");
+        ps.setInt(1, id_sala);
+        ps.setInt(2, i);
+        ps.setInt(3, j);
+        
         ResultSet rs = ps.executeQuery();
         
         if(rs.next())
@@ -562,6 +581,37 @@ public class DBManager implements Serializable {
             try
             {
                 ps.setString(1, sala);
+
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    while (rs.next()) {
+                        Posto p = new Posto();
+                        p.setIDposto(rs.getInt("id_posto"));
+                        p.setEsiste(rs.getBoolean("esiste"));
+                        p.setRiga(rs.getInt("riga"));
+                        p.setColonna(rs.getInt("colonna"));
+                        lista.add(p);
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        return lista;
+    }
+    
+    public List<Posto> getPosti(int id_spettacolo) throws SQLException
+    {
+        List<Posto> lista = new ArrayList<Posto>();
+        
+        PreparedStatement ps = con.prepareStatement("SELECT id_posto, riga, colonna, esiste FROM posto as P, spettacolo as S WHERE P.id_sala= S.id_sala AND S.id_spettacolo = ?");
+            
+            try
+            {
+                ps.setInt(1,id_spettacolo);
 
                 ResultSet rs = ps.executeQuery();
 

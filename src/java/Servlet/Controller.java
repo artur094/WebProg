@@ -7,6 +7,7 @@ package Servlet;
 
 import Bean.Film;
 import Bean.Posto;
+import Bean.Prenotazione;
 import Bean.Sala;
 import Bean.Security;
 import Bean.Spettacolo;
@@ -50,14 +51,15 @@ public class Controller extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-       
-        if(dbm == null)
-            return;
-        
         String operation = (String)request.getParameter("op");
         String email = (String)request.getParameter("email");
         String pass = (String)request.getParameter("password");
         
+        /*if(request.getParameter("op") == null)
+        {
+            forward_to(request, response, "/error.jsp");
+            return;
+        }*/
         switch(operation)
         {
             case "login":
@@ -74,14 +76,16 @@ public class Controller extends HttpServlet {
                 gotoprenotazione(request, response);
                 break;
             case "prenota":
-                
+                prenotazione(request, response);
                 break;
             case "add_spettacolo":
                 Utente user = (Utente)(request.getSession().getAttribute("user"));
                 //if(user!=null && user.getRuolo().equals("admin"))
                     addSpettacolo(request, response);
                 break;
-            case "logout": break;
+            case "logout": 
+                logout(request,response);
+                break;
             case "admin": break;
             case "pay": break;
             case "creasale":
@@ -102,6 +106,7 @@ public class Controller extends HttpServlet {
     
     protected void prenotazione(HttpServletRequest request, HttpServletResponse response)
     {
+        List<Prenotazione> prenotazioni = new ArrayList<Prenotazione>();
         int n_normali = Integer.parseInt(request.getParameter("normale"));
         int n_studenti = Integer.parseInt(request.getParameter("studente"));
         int n_ridotti = Integer.parseInt(request.getParameter("ridotto"));
@@ -115,6 +120,8 @@ public class Controller extends HttpServlet {
         
         int max_r = sala.getMax_righe();
         int max_c = sala.getMax_colonne();
+        
+        
         
         for (int i = 0; i < max_r; i++) {
             for (int j = 0; j < max_c; j++) {
@@ -137,13 +144,44 @@ public class Controller extends HttpServlet {
                     else if(n_disabili>0)
                         prezzo = "disabile";
                     
-                    dbm.AggiungiPrenotazione(u.getUserID(), s, prezzo, p);
+                    int id_prezzo;
+                    try{
+                         id_prezzo = dbm.getIDPrezzo(prezzo);
+                    }catch(SQLException sqlex)
+                    {
+                        id_prezzo = 1;
+                    }
+                    
+                    Prenotazione pre = new Prenotazione();
+                    try{
+                        pre.setPostoID(dbm.getIDPosto(sala.getId_sala(), i, j));
+                        p.setIDposto(pre.getPostoID());
+                    }catch(SQLException sqlex)
+                    {
+                        throw new RuntimeException("ID posto sbagliato");
+                    }
+                    pre.setPrezzo(id_prezzo);
+                    pre.setSpettacoloID(s.getIDspettacolo());
+                    
+                    if(u != null)
+                    {
+                        boolean b = dbm.AggiungiPrenotazione(u.getUserID(), s, id_prezzo, p);
+                        if(!b)
+                            forward_to(request, response, "/error.jsp");
+                    }
+                    
+                    prenotazioni.add(pre);
                 }
             }
         }
+        
+        request.getSession().setAttribute("lista_prenotazioni", prenotazioni);
+        request.getSession().setAttribute("return", "auth/payment.jsp");
+        if(u!=null)
+            forward_to(request, response, "/auth/payment.jsp");
+        else
+            forward_to(request, response, "/index.jsp");
     }
-    
-    
     
     protected void addSpettacolo(HttpServletRequest request, HttpServletResponse response)
     {
@@ -170,7 +208,7 @@ public class Controller extends HttpServlet {
     {
         request.getSession().setAttribute("user", null);
         
-        forward_to(request, response, "/login.jsp");
+        forward_to(request, response, "/index.jsp");
     }
     
     protected void gotoprenotazione(HttpServletRequest request, HttpServletResponse response)

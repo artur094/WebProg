@@ -6,6 +6,7 @@
 package Bean;
 
 import Database.DBManager;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -32,13 +33,19 @@ public class Sala {
     {
         this.dbm = dbm;
         this.id_spettacolo = id_spettacolo;
-        refreshMappa();
+        try{
+            refreshMappa();
+        }
+        catch(SQLException sqlex){
+            
+        }
     }
     
-    public void refreshMappa()
+    public void refreshMappa() throws SQLException
     {
         dbm.cancellaPrenotazioniVecchieNonPagate();
-        List<Posto> posti = dbm.getPostiSala(id_spettacolo);
+        List<Posto> posti_prenotati = dbm.getPostiSala(id_spettacolo);
+        List<Posto> posti = dbm.getPosti(id_spettacolo);
         
         mappa = creaMappa(posti);
         
@@ -47,14 +54,21 @@ public class Sala {
             int y = posti.get(i).getColonna();
             
             mappa[x][y] = "0";
-
-            if(posti.get(x).getIDPrenotazione() > 0)
-                mappa[x][y] = "2";  
-            if(posti.get(x).isPagato())
-                mappa[x][y] = "1";
             
-            if(!posti.get(x).isEsiste())
+            if(!posti.get(i).isEsiste())
                 mappa[x][y] = "3";
+        }
+        
+        for (int i = 0; i < posti_prenotati.size(); i++) {
+            int x = posti_prenotati.get(i).getRiga();
+            int y = posti_prenotati.get(i).getColonna();
+            
+            if(x<max_righe && y<max_colonne)
+            
+                mappa[x][y] = "2";
+            
+            if(!posti_prenotati.get(i).isPagato())
+                mappa[x][y] = "1";
         }
     }
     
@@ -63,10 +77,7 @@ public class Sala {
         max_righe = 0;
         max_colonne = 0;
         
-        if(posti == null)
-        {
-            return null;
-        }
+
         
         for (int i = 0; i < posti.size(); i++) {
             if(posti.get(i).getColonna() > max_colonne)

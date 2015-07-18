@@ -25,8 +25,8 @@
         <p>Ora: <%= s.getOra() %></p>
        
         
-        <form action="Controller?op=prenotazione" method="get">
-
+        <form action="Controller" method="get">
+            <input type="hidden" name="op" value="prenota" />
             <br>
             <label> Seleziona i posti che vuoi prenotare</label>
             <br>
