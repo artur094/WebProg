@@ -17,5 +17,13 @@
         <p>Email: <jsp:getProperty name="user" property="email" /></p>
         <p>Credito: <jsp:getProperty name="user" property="credito" /></p>
         <p>Ruolo: <jsp:getProperty name="user" property="ruolo" /></p>
+        
+        <%
+            if(user.getRuolo().equals("admin"))
+            {
+                out.println("<a href='auth/admin/add_spettacolo.jsp'>Aggiungi Spettacolo</a>");
+            }
+            
+            %>
     </body>
 </html>

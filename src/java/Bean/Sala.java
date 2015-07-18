@@ -30,8 +30,8 @@ public class Sala {
     {
         dbm.cancellaPrenotazioniVecchieNonPagate();
         List<Posto> posti = dbm.getPostiSala(id_spettacolo);
-        setMaxRigheColonne(posti);
-        mappa = new String[max_righe][max_colonne];
+        
+        mappa = creaMappa(posti);
         
         for (int i = 0; i < posti.size(); i++) {
             int x = posti.get(i).getRiga();
@@ -49,14 +49,14 @@ public class Sala {
         }
     }
     
-    private void setMaxRigheColonne(List<Posto> posti)
+    private String[][] creaMappa(List<Posto> posti )
     {
         max_righe = 0;
         max_colonne = 0;
         
         if(posti == null)
         {
-            return;
+            return null;
         }
         
         for (int i = 0; i < posti.size(); i++) {
@@ -65,6 +65,8 @@ public class Sala {
             if(posti.get(i).getRiga() > max_righe)
                 max_righe = posti.get(i).getRiga();
         }
+        
+        return new String[max_righe+1][max_colonne+1];
     }
     
     public String[][] getMappa()

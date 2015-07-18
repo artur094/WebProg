@@ -1,9 +1,25 @@
-<!DOCTYPE html>
+
+<%@page import="Bean.Utente"%>
 <!--
 To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
+
+<% 
+    Utente user = (Utente)(request.getSession().getAttribute("user"));
+    if(user!=null){
+        try{
+            request.getRequestDispatcher("/auth/user_profile.jsp").forward(request, response);
+        }
+        catch(ServletException serExc)
+        {
+            log("ServletException - Controller: "+serExc.toString());
+        }
+    }
+%>
+
+<!DOCTYPE html>
 <html>
     <head>
         <title>Login</title>

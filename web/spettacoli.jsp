@@ -42,9 +42,9 @@
                     out.print("</td>");
                     
                     out.print("<td>");
-                    out.print(s.getOra());
+                    out.print(s.getOra().toLocaleString());
                     out.print("</td>");
-                    
+
                     out.print("<td>");
                     out.print(s.getSala());
                     out.print("</td>");

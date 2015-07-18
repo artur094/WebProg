@@ -66,7 +66,7 @@ public class DBManager implements Serializable {
     {
         List<Posto> posti = new ArrayList<>();
         try{
-            PreparedStatement ps = con.prepareStatement("SELECT PRE.id_prenotazione, PRE.id_spettacolo,PO.id_posto, PO.riga, PO.colonna,PO.pagato, PO.esiste FROM (posto as PO LEFT JOIN prenotazione as PRE ON PO.ID_POSTO = PRE.ID_POSTO), spettacolo as S WHERE PO.id_sala = S.id_sala AND PRE.id_sala = S.id_sala AND S.ID_SPETTACOLO = ?");
+            PreparedStatement ps = con.prepareStatement("SELECT PRE.id_prenotazione, PRE.id_spettacolo,PO.id_posto, PO.riga, PO.colonna,PO.pagato, PO.esiste FROM (posto as PO LEFT JOIN prenotazione as PRE ON PO.ID_POSTO = PRE.ID_POSTO), spettacolo as S WHERE PO.id_sala = S.id_sala AND PO.id_sala = S.id_sala AND S.ID_SPETTACOLO = ?");
             
             try
             {
@@ -148,7 +148,7 @@ public class DBManager implements Serializable {
         
         //si, serve un timestamp o sql si lamenta
         java.sql.Timestamp dataTmp = new java.sql.Timestamp(giornoOra.getTime());
-        
+        dataTmp.setMinutes(dataTmp.getMinutes()+15);
         ps.setTimestamp(1,dataTmp);
         
         try
@@ -327,11 +327,14 @@ public class DBManager implements Serializable {
             return false;
         }
     }
+    
     //DAFINIRE
     public boolean Paga()
     {
         return false;
     }
+    
+    
     
     //da testare
     public boolean CreaPrenotazione(Prenotazione p){
@@ -385,11 +388,141 @@ public class DBManager implements Serializable {
             PreparedStatement ps = con.prepareStatement("INSERT INTO spettacolo(id_film,data_ora,id_sala) VALUES (?,?,?)");
             ps.setInt(1,s.getIDfilm());
             ps.setTimestamp(2, new Timestamp(s.getOra().getTime()));
-            ps.setInt(3, s.getIDfilm());
+            ps.setInt(3, s.getIDsala());
             ps.executeUpdate();
             return true;
         }catch(SQLException ex){
             return false;
         } 
     }
+    
+    public boolean CreaSpettacolo(int id_film, int id_sala, Timestamp data){
+        try{
+            PreparedStatement ps = con.prepareStatement("INSERT INTO spettacolo(id_film,data_ora,id_sala) VALUES (?,?,?)");
+            ps.setInt(1,id_film);
+            ps.setTimestamp(2, data);
+            ps.setInt(3, id_sala);
+            ps.executeUpdate();
+            return true;
+        }catch(SQLException ex){
+            return false;
+        } 
+    }
+    
+    public boolean creaSale() throws SQLException
+    {
+        //Sala Parcheggio 50 posti 10c - 5r (c = colonne, r = righe)
+        //Sala Piscina 50 posti 10c - 5r
+        //Sala Nerd 80 posti 10c - 8r
+        //Sala Cuori 80 posti 10c - 8r
+        
+        List<Posto> lista;
+        int id;
+        
+        lista = getPosti("Sala Parcheggio");
+        id = getSalaID("Sala Parcheggio");
+        if(id<0)
+            return false;
+        creaSala(lista, id, 5, 10);
+        
+        lista = getPosti("Sala Piscina");
+        id = getSalaID("Sala Piscina");
+        if(id<0)
+            return false;
+        creaSala(lista, id, 5, 10);
+        
+        lista = getPosti("Sala Nerd");
+        id = getSalaID("Sala Nerd");
+        if(id<0)
+            return false;
+        creaSala(lista, id, 8, 10);
+        
+        lista = getPosti("Sala Cuori");
+        id = getSalaID("Sala Cuori");
+        if(id<0)
+            return false;
+        creaSala(lista, id, 8, 10);
+        
+        return true;
+    }
+    
+    public int getSalaID(String nome_sala) throws SQLException
+    {
+        PreparedStatement ps = con.prepareStatement("SELECT id_sala FROM sala WHERE descrizione = ?");
+        ps.setString(1, nome_sala);
+        
+        ResultSet rs = ps.executeQuery();
+        if(rs.next())
+        {
+            return rs.getInt("id_sala");
+        }
+        else return -1;
+ 
+    }
+    
+    private void creaSala(List<Posto> posti, int id_sala, int max_rows, int max_cols) throws SQLException
+    {
+        String[][] mappa = new String[max_rows][max_cols];
+        
+        for (int i = 0; i < max_rows; i++) {
+            for (int j = 0; j < max_cols; j++) {
+                mappa[i][j] = "X";
+            }
+        }
+        
+        for (int i = 0; i < posti.size(); i++) {
+            int x = posti.get(i).getRiga();
+            int y = posti.get(i).getColonna();
+            
+            mappa[x][y] = "O";
+        }
+        
+        for (int i = 0; i < max_rows; i++) {
+            for (int j = 0; j < max_cols; j++) {
+                if(mappa[i][j].equals("X"))
+                {
+                    PreparedStatement ps = con.prepareStatement("INSERT INTO posto(riga,colonna,esiste, id_sala) VALUES (?,?,?,?)");
+                    ps.setInt(1,i);
+                    ps.setInt(2, j);
+                    ps.setBoolean(3, false);
+                    ps.setInt(4, id_sala);
+                    ps.executeUpdate();
+                }
+            }
+        }
+    }
+    
+    
+    public List<Posto> getPosti(String sala) throws SQLException
+    {
+        List<Posto> lista = new ArrayList<Posto>();
+        
+        PreparedStatement ps = con.prepareStatement("SELECT id_posto, riga, colonna, esiste FROM posto as P, sala as S WHERE P.id_sala = S.id_sala AND S.descrizione = ?");
+            
+            try
+            {
+                ps.setString(1, sala);
+
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    while (rs.next()) {
+                        Posto p = new Posto();
+                        p.setIDposto(rs.getInt("id_posto"));
+                        p.setEsiste(rs.getBoolean("esiste"));
+                        p.setRiga(rs.getInt("riga"));
+                        p.setColonna(rs.getInt("colonna"));
+                        lista.add(p);
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        return lista;
+    }
+    
 }
+

@@ -16,9 +16,7 @@
                 int id = Integer.parseInt(request.getParameter("id"));
                 film = Film.getFilmfromDB(id);   
             }
-            else
-                throw new RuntimeException("Film not found");
-        %>
+%>
 <!DOCTYPE html>
 <html>
     <head>

@@ -6,6 +6,7 @@
 package Servlet;
 
 import Bean.Film;
+import Bean.Sala;
 import Bean.Security;
 import Bean.Spettacolo;
 import Bean.Utente;
@@ -13,10 +14,15 @@ import Database.DBManager;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.derby.client.am.DateTime;
 import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 
 /**
@@ -63,14 +69,50 @@ public class Controller extends HttpServlet {
                 break;
             case "prenota":
                 prenotazione(request, response);
-                
+                break;
+            case "add_spettacolo":
+                Utente user = (Utente)(request.getSession().getAttribute("user"));
+                //if(user!=null && user.getRuolo().equals("admin"))
+                    addSpettacolo(request, response);
                 break;
             case "logout": break;
             case "admin": break;
             case "pay": break;
-            default: break;
+            case "creasale":
+                try{
+                    dbm.creaSale();
+                }
+                catch(SQLException sqlex)
+                {
+                    forward_to(request, response, "/error.jsp");
+                }
+                break;
+            default:
+                forward_to(request, response, "/error.jsp");
+                break;
         }
         
+    }
+    
+    protected void addSpettacolo(HttpServletRequest request, HttpServletResponse response)
+    {
+        
+        int id_film = Integer.parseInt(request.getParameter("film"));
+        int id_sala = Integer.parseInt(request.getParameter("sala"));
+        String data = request.getParameter("data");
+        String ora = request.getParameter("ora");
+        
+       try{
+            Date dt = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(data+" "+ora);
+            boolean creato = dbm.CreaSpettacolo(id_film, id_sala, new Timestamp(dt.getTime()));
+            if(creato)
+                forward_to(request, response, "/auth/admin/add_spettacolo.jsp?op=done");
+            else
+                forward_to(request, response, "/error.jsp");
+        }catch(ParseException pex)
+        {
+            forward_to(request, response, "/error.jsp");
+        }
     }
     
     protected void logout(HttpServletRequest request, HttpServletResponse response)
@@ -82,34 +124,25 @@ public class Controller extends HttpServlet {
     
     protected void prenotazione(HttpServletRequest request, HttpServletResponse response)
     {
-        Utente user = (Utente)request.getSession().getAttribute("user");
         int id_spettacolo = Integer.parseInt(request.getParameter("id"));
         Spettacolo s = null;
-        
-         if(user == null)
-         {
-              forward_to(request, response, "/login.jsp");
-              return;
-         }
-           
+        Sala sala = null;
         
         try
         {
             s = dbm.getSpettacolo(id_spettacolo);
+            
+            sala = new Sala(dbm, s.getIDspettacolo());
         }
         catch(SQLException sqlex)
         {
-            error(request, response);
-            return;
-        }
-        if(s == null)
-        {
-            error(request, response);
+            forward_to(request, response, "/error.jsp");
             return;
         }
         
         request.getSession().setAttribute("spettacolo", s);
-        forward_to(request, response, "/auth/prenotazione.jsp");
+        request.getSession().setAttribute("sala", sala);
+        forward_to(request, response, "/prenotazione.jsp");
     }
     
     protected void locandina_film(HttpServletRequest request, HttpServletResponse response, int id_film)
@@ -182,7 +215,7 @@ public class Controller extends HttpServlet {
         }
     }
     
-    protected void forward_to(HttpServletRequest request, HttpServletResponse response,String url)
+    void forward_to(HttpServletRequest request, HttpServletResponse response,String url)
     {
         try{
             request.getRequestDispatcher(url).forward(request, response);
@@ -256,6 +289,7 @@ public class Controller extends HttpServlet {
         
         try{
             dbm = new DBManager(URL_DB);
+            
         }
         catch(SQLException sqlex){
             log(sqlex.toString());
