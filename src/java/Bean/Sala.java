@@ -86,7 +86,9 @@ public class Sala {
                 max_righe = posti.get(i).getRiga();
         }
         
-        return new String[max_righe+1][max_colonne+1];
+        max_righe++;
+        max_colonne++;
+        return new String[max_righe][max_colonne];
     }
     
     public String[][] getMappa()

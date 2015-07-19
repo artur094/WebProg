@@ -23,6 +23,7 @@
         <p>Titolo: <%= s.getTitolo() %></p>
         <p>Durata: <%= s.getDurata() %></p>
         <p>Ora: <%= s.getOra() %></p>
+        <p>Sala: <%= s.getSala() %></p>
        
         
         <form action="Controller" method="get">

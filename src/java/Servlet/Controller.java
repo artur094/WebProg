@@ -6,6 +6,7 @@
 package Servlet;
 
 import Bean.Film;
+import Bean.Pagamento;
 import Bean.Posto;
 import Bean.Prenotazione;
 import Bean.Sala;
@@ -87,7 +88,9 @@ public class Controller extends HttpServlet {
                 logout(request,response);
                 break;
             case "admin": break;
-            case "pay": break;
+            case "paga":
+                paga(request, response);
+                break;
             case "creasale":
                 try{
                     dbm.creaSale();
@@ -101,6 +104,34 @@ public class Controller extends HttpServlet {
                 forward_to(request, response, "/error.jsp");
                 break;
         }
+        
+    }
+    
+    protected void paga(HttpServletRequest request, HttpServletResponse response)
+    {
+        Utente u = (Utente)(request.getSession().getAttribute("user"));
+        String codice = (String)(request.getSession().getAttribute("banca"));
+        
+        //controllare il codice
+        
+        try{
+            List<Prenotazione> lista = (new Pagamento(u.getUserID())).getPagamenti();
+            for (int i = 0; i < lista.size(); i++) {
+                if(request.getParameter((String.valueOf(lista.get(i).getPrenotazioneID()))) != null)
+                {
+                    dbm.setPrenotazionePagata(lista.get(i).getPrenotazioneID());
+                }
+            }
+            forward_to(request, response, "/auth/user_profile.jsp");
+            
+            
+        }catch(SQLException sqlex)
+        {
+            forward_to(request, response, "/error.jsp");
+            return;
+        }
+        
+        
         
     }
     
@@ -121,7 +152,13 @@ public class Controller extends HttpServlet {
         int max_r = sala.getMax_righe();
         int max_c = sala.getMax_colonne();
         
-        
+        try{
+            sala.setId_sala(dbm.getSalaID(s.getSala()));
+            s.setIDsala(sala.getId_sala());
+        }catch(SQLException sqlex)
+        {
+            
+        }
         
         for (int i = 0; i < max_r; i++) {
             for (int j = 0; j < max_c; j++) {
@@ -177,8 +214,12 @@ public class Controller extends HttpServlet {
         
         request.getSession().setAttribute("lista_prenotazioni", prenotazioni);
         request.getSession().setAttribute("return", "auth/payment.jsp");
+        
         if(u!=null)
+        {
             forward_to(request, response, "/auth/payment.jsp");
+            return;
+        }
         else
             forward_to(request, response, "/index.jsp");
     }
@@ -222,6 +263,7 @@ public class Controller extends HttpServlet {
             s = dbm.getSpettacolo(id_spettacolo);
             
             sala = new Sala(dbm, s.getIDspettacolo());
+            sala.refreshMappa();
         }
         catch(SQLException sqlex)
         {

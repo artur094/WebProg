@@ -10,6 +10,7 @@ import Bean.Spettacolo;
 import Bean.Utente;
 import Bean.Film;
 import Bean.Posto;
+import Bean.Prezzo;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -54,7 +55,10 @@ public class DBManager implements Serializable {
     public boolean cancellaPrenotazioniVecchieNonPagate()
     {
         try{
-            PreparedStatement ps = con.prepareStatement("DELETE FROM prenotazione WHERE {fn TIMESTAMPDIFF(SQL_TSI_MINUTE, CURRENT_TIMESTAMP, DATA_ORA_OPERAZIONE)} > 15;");
+            PreparedStatement ps = con.prepareStatement("DELETE FROM prenotazione WHERE data_ora_operazione < ? AND pagato = false");
+            Date dt = new Date();
+            dt.setMinutes(dt.getMinutes()-15);
+            ps.setTimestamp(1, new Timestamp(dt.getTime()));
             ps.executeUpdate();
             return true;
         }catch(SQLException ex){
@@ -383,18 +387,23 @@ public class DBManager implements Serializable {
             ps.setInt(1, u.getUserID());
             
             ResultSet rs = ps.executeQuery();
-            
-            while(rs.next())
+            try{
+                while(rs.next())
+                {
+                    Prenotazione p = new Prenotazione();
+                    p.setUtente(u);
+                    p.setPrenotazioneID(rs.getInt("id_prenotazione"));
+                    p.setSpettacoloID(rs.getInt("id_spettacolo"));
+                    p.setPrezzo(rs.getInt("id_prezzo"));
+                    p.setPostoID(rs.getInt("id_posto"));
+                    p.setDataOraOperazione(new Date(rs.getTimestamp("data_ora_prenotazione").getTime()));
+
+                    prenotazioni.add(p);
+                }
+            }finally
             {
-                Prenotazione p = new Prenotazione();
-                p.setUtente(u);
-                p.setPrenotazioneID(rs.getInt("id_prenotazione"));
-                p.setSpettacoloID(rs.getInt("id_spettacolo"));
-                p.setPrezzo(rs.getInt("id_prezzo"));
-                p.setPostoID(rs.getInt("id_posto"));
-                p.setDataOraOperazione(new Date(rs.getTimestamp("data_ora_prenotazione").getTime()));
-                
-                prenotazioni.add(p);
+                rs.close();
+                ps.close();
             }
             
         }catch(SQLException ex)
@@ -410,12 +419,16 @@ public class DBManager implements Serializable {
         PreparedStatement ps = con.prepareStatement("SELECT id_prezzo FROM prezzo WHERE tipo = ?");
         ps.setString(1, prezzo);
         ResultSet rs = ps.executeQuery();
-        
-        if(rs.next())
-        {
-            return rs.getInt("id_sala");
+        try{
+            if(rs.next())
+            {
+                return rs.getInt("id_prezzo");
+            }
+        }finally{
+            rs.close();
+            ps.close();
         }
-        else return -1;
+        return -1;
     }
     
     public int getIDPosto(int id_sala, int i, int j) throws SQLException
@@ -426,15 +439,22 @@ public class DBManager implements Serializable {
         ps.setInt(3, j);
         
         ResultSet rs = ps.executeQuery();
-        
-        if(rs.next())
-        {
-            return rs.getInt("id_sala");
+        try{
+            if(rs.next())
+            {
+                return rs.getInt("id_posto");
+            }
         }
-        else return -1;
+        finally
+        {
+            rs.close();
+            ps.close();
+        }
+        return -1;
     }
     
     //da testare
+    //da aggiungere il rimborso dell'80%
     //cancellare prenozatione
     public boolean CancellaPrenotazione(int IDprenotazione){
         try{
@@ -634,5 +654,173 @@ public class DBManager implements Serializable {
         return lista;
     }
     
+    public List<Prenotazione> getPrenotazioniNonPagate(int user_id)
+    {
+        cancellaPrenotazioniVecchieNonPagate();
+        
+        List<Prenotazione> lista = new ArrayList<Prenotazione>();
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT id_prenotazione, id_utente, id_spettacolo, id_prezzo, id_posto, data_ora_operazione FROM prenotazione WHERE id_utente = ? AND pagato = false");
+            
+            try
+            {
+                ps.setInt(1, user_id);
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    while (rs.next()) {
+                        Prenotazione p = new Prenotazione();
+                        
+                        p.setDataOraOperazione(new Date(rs.getTimestamp("data_ora_operazione").getTime()));
+                        p.setPostoID(rs.getInt("id_posto"));
+                        p.setPrezzo(rs.getInt("id_prezzo"));
+                        p.setSpettacoloID(rs.getInt("id_spettacolo"));
+                        p.setPrenotazioneID(rs.getInt("id_prenotazione"));
+                        p.setUtente(getUtente(user_id));
+                       
+                        lista.add(p);
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        }catch(SQLException sqlex)
+        {
+            return null;
+        }
+        
+        return lista;
+    }
+    
+    public Utente getUtente(int id_utente)
+    {
+        Utente u = null;
+        
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT email, credito, ruolo FROM utente as u, ruolo as r WHERE id_utente = ? AND r.id_ruolo = u.id_ruolo");
+            
+            try
+            {
+                ps.setInt(1, id_utente);
+                
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    if (rs.next()) {
+                        u = new Utente();
+                        
+                        u.setEmail(rs.getString("email"));
+                        u.setCredito(rs.getInt("credito"));
+                        u.setRuolo(rs.getString("ruolo"));
+                        u.setUserID(id_utente);
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        }catch(SQLException sqlex)
+        {
+            return null;
+        }
+        
+        return u;
+    }
+    
+    public Posto getPosto(int id_posto)
+    {
+        Posto p = null;
+        
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT id_sala, riga, colonna, esiste FROM posto WHERE id_posto = ?");
+            
+            try
+            {
+                ps.setInt(1, id_posto);
+                
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    if (rs.next()) {
+                        p = new Posto();
+                        
+                        p.setIDposto(id_posto);
+                        p.setColonna(rs.getInt("colonna"));
+                        p.setRiga(rs.getInt("riga"));
+                        p.setEsiste(rs.getBoolean("esiste"));
+                        p.setIDsala(rs.getInt("id_sala"));
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        }catch(SQLException sqlex)
+        {
+            return null;
+        }
+        
+        return p;
+    }
+    
+    public Prezzo getPrezzo(int id_prezzo)
+    {
+        Prezzo p = null;
+        
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT tipo, prezzo FROM prezzo WHERE id_prezzo = ?");
+            
+            try
+            {
+                ps.setInt(1, id_prezzo);
+                
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    if (rs.next()) {
+                        p = new Prezzo();
+                        p.setId_prezzo(id_prezzo);
+                        p.setPrezzo(rs.getDouble("prezzo"));
+                        p.setTipo(rs.getString("tipo"));
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        }catch(SQLException sqlex)
+        {
+            return null;
+        }
+        
+        return p;
+    }
+    
+    public boolean setPrenotazionePagata(int id_prenotazione)
+    {
+        try{
+            PreparedStatement ps = con.prepareStatement("UPDATE prenotazione SET pagato = true WHERE id_prenotazione = ?");
+            
+            ps.setInt(1, id_prenotazione);
+    
+            ps.executeUpdate();
+            return true;  
+       }catch(SQLException ex){
+            return false;
+        }
+    }
+    
+    
 }
+
+
 
