@@ -173,13 +173,25 @@ public class Controller extends HttpServlet {
                     
                     String prezzo = "normale";
                     if(n_studenti > 0)
+                    {
                         prezzo = "studente";
+                        n_studenti--;
+                    }
                     else if(n_ridotti > 0)
+                    {
                         prezzo ="ridotto";
+                        n_ridotti--;
+                    }
                     else if(n_militari > 0)
+                    {
                         prezzo ="militare";
+                        n_militari--;
+                    }
                     else if(n_disabili>0)
+                    {
                         prezzo = "disabile";
+                        n_disabili--;
+                    }
                     
                     int id_prezzo;
                     try{
