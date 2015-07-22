@@ -61,8 +61,9 @@ public class GeneratoreQR extends HttpServlet {
         pageStream.close();
         
         //codice per testare anche l'invio di email. Andiamo, è più comodo nella stessa pagina, lo sapete tutti
-        //Email testE = new Email("serverEmail","hostEmail",dest,"mittente",outputStream.toString());
-        //testE.Invia();
+        //il costruttore al momento non fa nulla, devo prima vedere se google ha ragione
+        Email testE = new Email();
+        testE.Invia();
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

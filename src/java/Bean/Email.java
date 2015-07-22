@@ -5,7 +5,10 @@
  */
 package Bean;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.mail.*;
 import javax.mail.internet.*;
 
@@ -35,24 +38,50 @@ public class Email {
      * Invia l'email con i dati inseriti dal costruttore 
      */
     public void Invia(){
-        try {
+        try { 
             Properties props = System.getProperties();
-            props.put(serverEmail, hostEmail); // al posto del nome in rosso va il mio server o smarthost provider
-
-            props.put("mail.debug", "true");    //cancellare questa riga quando tutto funziona bene (attiva mod. debug)
-            Session session = Session.getDefaultInstance(props);
-            Message message = new MimeMessage(session);
-            InternetAddress from = new InternetAddress(indirizzoMittente);
-            InternetAddress to[] = InternetAddress.parse(indirizzoDestinatario);
-
-            message.setFrom(from);
-            //message.setRecipients(Message.RecipientType.TO, to);
-            message.setSubject("Test messaggio inviato da Java.");
-            message.setSentDate(new Date());
-            message.setText("questo\ne' il messaggio\ngino\n");
-            Transport.send(message);
+            
+            props.setProperty("mail.tranport.protocol", "smtp");
+            props.setProperty("mail.smtp.host", "smtp.gmail.com");
+            props.setProperty("mail.smtp.port", "587");
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("isSSL","true");
+            //props.put("mail.smtp.startssl.enable", "true");
+            props.put( "mail.debug", "true" );
+          
+            
+            Authenticator auth = new SMTPAuthenticator();
+            Session session = Session.getDefaultInstance(props,auth);
+            String msgBody = "....hi! I'm made of potatoes";
+            
+            Message msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress("progettoWeb94@gmail.com"));
+            msg.addRecipient(Message.RecipientType.TO,new InternetAddress("paolo.chiste-2@studenti.unitn.it", "Paolo"));
+            msg.setSubject("Email di conferma Posto");
+            msg.setText(msgBody);
+           
+            Transport.send(msg);
+            
+//            Transport transport = session.getTransport("smtp");
+//            transport.connect("smtp.google.com","progettoWeb94@gmail.com","passwordMoltoSicura");
+//            transport.sendMessage(msg, msg.getAllRecipients());
+//            transport.close();
+            
         } catch (MessagingException e) {
             e.printStackTrace(); // USARE LOG4J!!!
         }
+        catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(Email.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private class SMTPAuthenticator extends javax.mail.Authenticator {
+        public PasswordAuthentication getPasswordAuthentication() {
+           String username = "progettoWeb94@gmail.com";
+           String password = "passwordMoltoSicura";
+           return new PasswordAuthentication(username, password);
+        }
+    
     }
 }
