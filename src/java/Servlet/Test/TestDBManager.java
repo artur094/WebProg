@@ -3,26 +3,23 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Servlet;
+package Servlet.Test;
 
-import Bean.Prenotazione;
 import Bean.Utente;
-import Database.DBManager;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import Database.DBManager;
+import java.sql.SQLException;
 
 /**
- * Controller usato prevalentemente per test sul backend
- * @author Paolo
+ *
+ * @author Utente
  */
-@WebServlet(name = "TestController", urlPatterns = {"/TestController"})
-public class TestController extends HttpServlet {
+public class TestDBManager extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,30 +32,27 @@ public class TestController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       
-        try {
-            DBManager dbm = new DBManager("jdbc:derby://localhost:1527/noPassword");
-
-            if (request.getParameter("op").equals("prenotazione")) {
-                Utente u = dbm.authenticate("gandalf@mordor.sa","admin");
-                Prenotazione p = new Prenotazione(u, 1, 1, 2);
-                dbm.InserisciPrenotazione(p);
-            }
-
-        } catch (SQLException ex) {
-            System.out.println("DAMMIT");
+        Utente esito = new Utente();
+        try{
+            DBManager testDb = new DBManager("jdbc:derby://localhost:1527/noPassword");
+            String email = request.getParameter("email");
+            String password = request.getParameter("password");
+            
+            esito = testDb.authenticate(email, password);
+        }catch(SQLException ex){
             return;
         }
-        
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet TestController</title>");            
+            out.println("<title>Servlet TestDBManager</title>");            
             out.println("</head>");
             out.println("<body>");
+            out.println("<h1>"+ esito.getUserID() +"</h1>");
+            out.println("<h1>"+ esito.getPassword() +"</h1>");
             out.println("</body>");
             out.println("</html>");
         }

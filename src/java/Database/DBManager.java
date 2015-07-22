@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 
@@ -302,17 +303,57 @@ public class DBManager implements Serializable {
         return spect;
     }
     
-    //creazione utente
-    public boolean CreaUtente(Utente u){
+       //creazione utente
+    public double CreaUtente(Utente u){
         try{
-            PreparedStatement ps = con.prepareStatement("INSERT INTO utente(email,password,credito,id_ruolo) VALUES (?,?,?,?)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO utente(email,password,credito,id_ruolo,verificato,codice_attivazione) VALUES (?,?,?,?,?,?)");
+            double codiceAttivazione = Math.round(Math.random()*5134);
             
             ps.setString(1,u.getEmail());
             ps.setString(2,u.getPassword());
             ps.setDouble(3,u.getCredito());
             ps.setInt(4, 2); // 2 --> valore user (da recuperare dinamicamente)
+            ps.setBoolean(5, false);
+            ps.setDouble(6, codiceAttivazione);
             ps.executeUpdate();
-            return true;
+            return codiceAttivazione;
+        }catch(SQLException ex){
+            return -1;
+        }
+    }
+    
+//    //creazione utente
+//    public boolean CreaUtente(Utente u){
+//        try{
+//            PreparedStatement ps = con.prepareStatement("INSERT INTO utente(email,password,credito,id_ruolo,verificato) VALUES (?,?,?,?,?)");
+//            
+//            ps.setString(1,u.getEmail());
+//            ps.setString(2,u.getPassword());
+//            ps.setDouble(3,u.getCredito());
+//            ps.setInt(4, 2); // 2 --> valore user (da recuperare dinamicamente)
+//            ps.setBoolean(5, false);
+//            ps.executeUpdate();
+//            return true;
+//        }catch(SQLException ex){
+//            return false;
+//        }
+//    }
+    
+    //verifica la email dell'utente e lo abilita
+    public boolean AttivaUtente(Utente u,double codiceAttivazione){
+        try{
+            
+            PreparedStatement ps = con.prepareStatement("SELECT id_attivazione FROM utente WHERE id_utente = ?");
+            ps.setInt(1, u.getUserID());
+            ResultSet rs = ps.executeQuery();
+            int codice = rs.getInt("id_attivazione");
+            if (codice == codiceAttivazione){
+                PreparedStatement psAttivazione = con.prepareStatement("UPDATE SPETTACOLO SET verificato = 'true'");
+                int righeModificate = psAttivazione.executeUpdate();
+                if(righeModificate == 1)
+                    return true;
+            }
+            return false;
         }catch(SQLException ex){
             return false;
         }
@@ -386,6 +427,28 @@ public class DBManager implements Serializable {
         }
         
         return prenotazioni;
+    }
+    
+    /**
+     * Prende lo storico delle prenotazioni per un dato utente u
+     *@param u utente di cui voglio le prenotazioni
+     */
+    public List<Prenotazione> getPrenotazioni(Utente u) throws SQLException{
+        List<Prenotazione> lista = new ArrayList<Prenotazione>();
+        PreparedStatement ps = con.prepareStatement("SELECT * FROM prenotazione WHERE id_utente = ? AND pagato = 'true'");
+        ps.setInt(1,u.getUserID());
+        ResultSet rs = ps.executeQuery();
+        try{
+            while(rs.next())
+            {
+                Prenotazione tmp = new Prenotazione(u,rs.getInt("id_spettacolo"),rs.getInt("id_prezzo"),rs.getInt("id_posto"));
+                lista.add(tmp);
+            }
+        }finally{
+            rs.close();
+            ps.close();
+        }
+        return lista;
     }
     
     public int getIDPrezzo(String prezzo) throws SQLException

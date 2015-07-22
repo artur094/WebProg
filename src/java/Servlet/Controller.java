@@ -341,7 +341,7 @@ public class Controller extends HttpServlet {
         else
         {
             request.getSession().setAttribute("user", user);
-            forward_to(request, response, "/accountPage.html");
+            forward_to(request, response, "/accountPage.jsp");
         }
     }
     
@@ -353,16 +353,17 @@ public class Controller extends HttpServlet {
         u.setPassword(password);
         u.setRuolo("user");
         
-        boolean esito = dbm.CreaUtente(u);
+        double codiceEsito = dbm.CreaUtente(u);
         
-        if(esito)
+        if(codiceEsito != -1)
         {
+            dbm.AttivaUtente(u, codiceEsito); //DEBUG
             request.getSession().setAttribute("user", u);
             forward_to(request, response, "/auth/user_profile.jsp");
-        }else
-        {
+        }else{
             forward_to(request, response, "/registrazione.html");
         }
+        
     }
     
     void forward_to(HttpServletRequest request, HttpServletResponse response,String url)

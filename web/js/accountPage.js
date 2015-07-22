@@ -1,6 +1,4 @@
 $(document).ready(function() {   
-    $(".welcomeName").append(" Pippo Pasticcio");
-    
     var film = {  //nomeFilm prezzo dataAquisto
         film1: "<tr id='ted'>               <td>ted</td>                <td>prezzo</td>   </tr>",
         film2: "<tr id='cattivissimoMe'>    <td>cattivissimoMe</td>     <td>prezzo</td>   </tr>",

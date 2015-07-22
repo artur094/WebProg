@@ -8,8 +8,6 @@
     <script src="js/jquery-ui.js"></script>
     <script src="js/jquery-ui.min.js"></script>
     <script src="js/jquery.min.js"></script>
-    <link href="css/slider.css" type="text/css" rel="stylesheet">
-    <script src="js/accountPage.js"></script>
     <script src="js/infoHome.js"></script>
     <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
 </head>
@@ -23,25 +21,16 @@
         <div id="btnAccedi" class="btnAccedi">Logout</div> 
     </div>
 </header>
-<div class="accountPageUser">
-    </br>
-    <h1 class="welcomeName">Benvenuto nel tuo account</h1>
-    <span class="cronoDeals">
-        <h2>Cronologia acquisti</h2>
-        <table border="0px"; id="tableAcquisti">
-            <!--                    -->
-            <!--    lista generata dinamicamente dei titoli         -->
-        </table>
-    </span>
-    <span class="containerInfoDeals">
-        <p> containerInfoDeals</p>
-        <p> containerInfoDeals</p>
-        <p> containerInfoDeals</p>
-        <p> containerInfoDeals</p>
-    </span> 
-</div>
-<div class="accountPageAdmin">
+<div class="accountPage">
     
+    <h1 class="welcomeName">Benvenuto Admin </h1>
+        <h2>Inserisci spettacolo</h2>
+        <form action="Controller" method="POST">
+            <input type="text" name="titolo"> 
+            <input type="text" name="Data">
+            <input type="text" name="regista">
+            <input type="text" name="locandina"> 
+        </form>     
 </div>
 <footer>
     <div> &#169; 2015 CINELAND - Indirizzo . Trento (TN) - tel. 0464852145 - P.Iva 14256748790 </div> 
