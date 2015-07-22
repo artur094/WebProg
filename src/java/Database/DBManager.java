@@ -40,7 +40,7 @@ public class DBManager implements Serializable {
             throw new RuntimeException(e.toString(), e);
         }
         
-        Connection con = DriverManager.getConnection(dburl, "APP","root");
+        Connection con = DriverManager.getConnection(dburl, "root","root");
         this.con = con;
     }
     

@@ -1,0 +1,235 @@
+body{
+    margin: 0px;
+    min-width: 700px !important;
+}
+header{
+    background-color: black;
+    height:100px;
+    margin-bottom: 0px;
+    <!-- display: inline; -->
+    min-width: 700px;
+    width: 100%;
+    display: table;
+}
+
+.container-logo{
+display: table-cell;
+    width: 80%;
+    position: relative;
+    
+}
+
+.a_logo{
+    position: relative;
+    padding-right: 320px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    height: 100%;
+}
+
+.logo{
+    min-height: 60px;
+    top: 15px;
+    margin-top: 20px;
+    margin-left: 10px;
+    background-image: url(CineScritta.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#btnAccedi{   //<!-- background in stylegradienti -->
+    display: table-cell;
+    width: 140px;
+    //height: 30px;
+    position: relative;
+    top: 15px;
+    margin-right: 20px;
+    //left: 12%;
+    //float: left;
+    //right: 10px;
+    
+    background: #fc7f12;
+    background-image: -webkit-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: -moz-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: -ms-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: -o-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: linear-gradient(to bottom, #fc7f12, #d44b1a);
+    -webkit-border-radius: 5;
+    -moz-border-radius: 5;
+    border-radius: 5px;
+    font-family: Arial;
+    color: #ffffff;
+    font-size: 17px;
+    padding: 7px 10px 7px 10px;
+    text-decoration: none;
+}
+
+#btnAccedi:hover{
+    color: #ffffff;
+    background: #d44b1a;
+    background-image: -webkit-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: -moz-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: -ms-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: -o-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: linear-gradient(to bottom, #d44b1a, #fc7f12);
+    text-decoration: none;
+}
+
+.btnLogout{  // <!-- background in stylegradienti -->
+    font: inherit;
+    vertical-align: baseline;
+    margin-left : 80%;
+    height: 14px; 
+    width: 144px; 
+    padding: 13px;  
+    color: #FFFFFF; 
+    font-family: 'Arial'; 
+    font-size: 22px; 
+    background: #FB8C37; 
+    text-align: center;
+    border-width: 0px;    border-color: #C97E1C; 
+    border-radius: 7px;  <!-- box-shadow: 0px 1px 60px 0px #FFE0B5; -->
+    text-shadow: 0px 1px 0px #8F7F24; 
+}
+
+table, th, td {
+    border: 0px solid black;
+    border-collapse: collapse;
+}
+.IMGpreViewSale{
+    width: 100px;
+    height: 100px;
+}
+
+.zonatab{
+    display: table; 
+    block-position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: bisque; 
+    padding-top: 400px;
+    min-width: 700px;
+}
+
+#LinkTabs {
+    background-color: black;
+    padding-top: 5px;
+    display:table-cell;
+    float:left;
+    text-align: center;
+    position: relative;
+    list-style: none;
+    min-width: 700px;
+    width: 100%;
+    padding-top: 10px;
+    height: 45px;
+}
+    #LinkTabs span { 
+        font-family: Verdana, sans-serif; font-size: 20px;color: white;
+        //top: 5px;
+        max-width: 20%;
+        min-width: 20%;
+    }
+
+#contieniContainer{
+    position: relative;
+    display: block;
+    clear: both;
+    width: 100%;
+    min-height: 600px; /* 350px + 25px (padding sx) + 25px (padding dx) */
+    color: #222;
+}
+
+#contieniContainer > div{
+    min-height: 600px;
+    width: 100%;
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-top: 40px;
+}
+
+#containTab{
+    position: absolute;
+    top: 0px;
+    display: block;
+    color: #222;
+    font-family: Verdana;
+    font-size: 12px;
+    background-color: white;
+    /*padding: 25px;*/
+    width: 100%;
+    min-height: 600px;
+    line-height: 22px;
+}
+
+.backgroundTab{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    //margin-left: -10%;
+    min-width: 100%;
+    min-height: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url(pattern1.jpg);
+    opacity: 0.15;
+    z-index: 1
+}
+
+.txtTab{
+    z-index: 10;
+}
+
+#containTabPrezzi{ //  <!-- background in stylegradienti -->
+    position: absolute;
+    display:none;
+    //z-index: 2;
+    top:0px;
+}
+#containTabInfo{  // <!-- background in stylegradienti -->
+    position: absolute;
+    display:none;
+     //   z-index: 3;
+    top:0px;
+}
+
+#containTabOrariContatti{ // <!-- background in stylegradienti -->
+    position: absolute;
+    display: none;
+     //   z-index: 4;
+    top:0px;
+}
+#containTabSale{  // <!-- background in stylegradienti -->
+    position: absolute;
+    display: none;
+        z-index: 5;
+    top:0px;
+}
+#containTabPreview{ //<!-- background in stylegradienti -->
+    position: absolute;
+    display: block;
+     //   z-index: 6;
+    top:0px;
+}
+#containTabFilm{ //<!-- background in stylegradienti -->
+    position: absolute;
+    display: none;
+    //    z-index: 7;
+    top:0px;
+}
+
+.activeTab{
+    font-weight: bolder;
+    color: orange !important;
+    //background-color: red;
+}
+
+footer{
+    background-color: black;
+    color:white;
+    text-align: center;
+}
+
+.form{
+display:block;
+}

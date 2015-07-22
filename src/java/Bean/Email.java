@@ -57,16 +57,11 @@ public class Email {
             
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress("progettoWeb94@gmail.com"));
-            msg.addRecipient(Message.RecipientType.TO,new InternetAddress("paolo.chiste-2@studenti.unitn.it", "Paolo"));
+            msg.addRecipient(Message.RecipientType.TO,new InternetAddress("luca.bazzanella-2@studenti.unitn.it", "Paolo"));
             msg.setSubject("Email di conferma Posto");
             msg.setText(msgBody);
            
             Transport.send(msg);
-            
-//            Transport transport = session.getTransport("smtp");
-//            transport.connect("smtp.google.com","progettoWeb94@gmail.com","passwordMoltoSicura");
-//            transport.sendMessage(msg, msg.getAllRecipients());
-//            transport.close();
             
         } catch (MessagingException e) {
             e.printStackTrace(); // USARE LOG4J!!!

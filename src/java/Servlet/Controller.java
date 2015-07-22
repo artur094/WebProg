@@ -23,6 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -332,25 +334,14 @@ public class Controller extends HttpServlet {
         // o email-password sbagliata
         // o altri errori
         // risendo alla pagina di login
-        if(user == null)
+        if(user == null)    
         {
             forward_to(request, response, "/error.jsp");
-            /*try{
-                (new Security()).ErrorPage(request, response, request.getSession());
-            }
-            catch(ServletException serExc)
-            {
-                log("ServletException - Controller: "+serExc.toString());
-            }
-            catch(IOException ioexc)
-            {
-                log("IOException - Controller: "+ioexc.toString());
-            }*/
         }
         else
         {
             request.getSession().setAttribute("user", user);
-            forward_to(request, response, "/auth/user_profile.jsp");
+            forward_to(request, response, "/accountPage.html");
         }
     }
     
@@ -447,10 +438,11 @@ public class Controller extends HttpServlet {
         super.init(); //To change body of generated methods, choose Tools | Templates.
         
         try{
-            dbm = new DBManager("jdbc:derby://localhost:1527/noPassword");
+            dbm = new DBManager("jdbc:derby://localhost:1527/cineDB");
             dbm = new DBManager(URL_DB);
         }
         catch(SQLException sqlex){
+            System.out.println("Impossibile connetersi al db! Controllare i dati per il database....Dettagli eccezione:" + sqlex.toString());
             log(sqlex.toString());
         }
     }

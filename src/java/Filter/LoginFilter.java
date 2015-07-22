@@ -7,6 +7,7 @@ package Filter;
 
 import Bean.Security;
 import Bean.Utente;
+import java.util.regex.*;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -101,11 +102,16 @@ public class LoginFilter implements Filter {
         
         doBeforeProcessing(request, response);
         
-
+        //controlla che i campi siano corretti
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
         
-        
-        
-        
+        Pattern p = Pattern.compile("/\b@/");
+        Matcher m = p.matcher(email);
+        if(!m.matches()){
+            //se l'email non contiene @
+            return;
+        }
         
         Throwable problem = null;
         try {
