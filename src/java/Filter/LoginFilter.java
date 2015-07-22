@@ -44,7 +44,7 @@ public class LoginFilter implements Filter {
         }
 
 	// reperisco il beans
-        Utente user = (Utente)((HttpServletRequest)request).getSession().getAttribute("userBean");
+        Utente user = (Utente)((HttpServletRequest)request).getSession().getAttribute("user");
         
         // controllo se non ha effettuato il LoginFilter
         if(user == null)

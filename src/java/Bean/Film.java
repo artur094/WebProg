@@ -5,28 +5,41 @@
  */
 package Bean;
 
+import Database.DBManager;
+import Servlet.Controller;
+import java.sql.SQLException;
+
 /**
  *
  * @author ivanmorandi
  */
 public class Film {
 
-    private int id_film;
+    private Integer id_film;
     private String titolo;
     private String genere;
     private String url_trailer;
-    private int durata;
+    private Integer durata;
     private String trama;
     private String url_locandina;
     
     public Film(){}
     
+    public static Film getFilmfromDB(int id_film) throws SQLException
+    {
+        Film f = null;
+        DBManager dbm = new DBManager(Controller.URL_DB);
+        f = dbm.getFilm(id_film);
+        
+        return f;
+    }
     
-    public int getId_film() {
+    
+    public Integer getId_film() {
         return id_film;
     }
 
-    public void setId_film(int id_film) {
+    public void setId_film(Integer id_film) {
         this.id_film = id_film;
     }
 
@@ -54,11 +67,11 @@ public class Film {
         this.url_trailer = url_trailer;
     }
 
-    public int getDurata() {
+    public Integer getDurata() {
         return durata;
     }
 
-    public void setDurata(int durata) {
+    public void setDurata(Integer durata) {
         this.durata = durata;
     }
 

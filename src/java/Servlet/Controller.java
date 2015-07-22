@@ -6,7 +6,10 @@
 package Servlet;
 
 import Bean.Film;
+import Bean.Pagamento;
+import Bean.Posto;
 import Bean.Prenotazione;
+import Bean.Sala;
 import Bean.Security;
 import Bean.Spettacolo;
 import Bean.Utente;
@@ -14,10 +17,17 @@ import Database.DBManager;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.derby.client.am.DateTime;
 import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 
 /**
@@ -26,6 +36,8 @@ import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
  */
 public class Controller extends HttpServlet {
 
+    public static final String URL_DB = "jdbc:derby://localhost:1527/CineDB";
+    
     DBManager dbm;
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,14 +52,15 @@ public class Controller extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-       
-        if(dbm == null)
-            return;
-        
         String operation = (String)request.getParameter("op");
         String email = (String)request.getParameter("email");
         String pass = (String)request.getParameter("password");
         
+        /*if(request.getParameter("op") == null)
+        {
+            forward_to(request, response, "/error.jsp");
+            return;
+        }*/
         switch(operation)
         {
             case "login":
@@ -60,60 +73,235 @@ public class Controller extends HttpServlet {
                 int id_film = Integer.parseInt(request.getParameter("id"));
                 locandina_film(request, response, id_film);
                 break;
+            case "gotoprenota":
+                gotoprenotazione(request, response);
+                break;
             case "prenota":
                 prenotazione(request, response);
-                
+                break;
+            case "add_spettacolo":
+                Utente user = (Utente)(request.getSession().getAttribute("user"));
+                //if(user!=null && user.getRuolo().equals("admin"))
+                    addSpettacolo(request, response);
+                break;
+            case "logout": 
+                logout(request,response);
                 break;
             case "admin": break;
-            case "pay": break;
-            default: break;
+            case "paga":
+                paga(request, response);
+                break;
+            case "creasale":
+                try{
+                    dbm.creaSale();
+                }
+                catch(SQLException sqlex)
+                {
+                    forward_to(request, response, "/error.jsp");
+                }
+                break;
+            default:
+                forward_to(request, response, "/error.jsp");
+                break;
         }
+        
+    }
+    
+    protected void paga(HttpServletRequest request, HttpServletResponse response)
+    {
+        Utente u = (Utente)(request.getSession().getAttribute("user"));
+        String codice = (String)(request.getSession().getAttribute("banca"));
+        
+        //controllare il codice
+        
+        try{
+            List<Prenotazione> lista = (new Pagamento(u.getUserID())).getPagamenti();
+            for (int i = 0; i < lista.size(); i++) {
+                if(request.getParameter((String.valueOf(lista.get(i).getPrenotazioneID()))) != null)
+                {
+                    dbm.setPrenotazionePagata(lista.get(i).getPrenotazioneID());
+                }
+            }
+            forward_to(request, response, "/auth/user_profile.jsp");
+            
+            
+        }catch(SQLException sqlex)
+        {
+            forward_to(request, response, "/error.jsp");
+            return;
+        }
+        
+        
         
     }
     
     protected void prenotazione(HttpServletRequest request, HttpServletResponse response)
     {
-        Utente user = (Utente)request.getSession().getAttribute("user");
+        List<Prenotazione> prenotazioni = new ArrayList<Prenotazione>();
+        int n_normali = Integer.parseInt(request.getParameter("normale"));
+        int n_studenti = Integer.parseInt(request.getParameter("studente"));
+        int n_ridotti = Integer.parseInt(request.getParameter("ridotto"));
+        int n_militari = Integer.parseInt(request.getParameter("militare"));
+        int n_disabili = Integer.parseInt(request.getParameter("disabile"));
+        
+        Sala sala = (Sala)(request.getSession().getAttribute("sala"));
+        Spettacolo s = (Spettacolo)(request.getSession().getAttribute("spettacolo"));
+        Utente u = (Utente)(request.getSession().getAttribute("user"));
+        List<Posto> lista = new ArrayList<Posto>();
+        
+        int max_r = sala.getMax_righe();
+        int max_c = sala.getMax_colonne();
+        
+        try{
+            sala.setId_sala(dbm.getSalaID(s.getSala()));
+            s.setIDsala(sala.getId_sala());
+        }catch(SQLException sqlex)
+        {
+            
+        }
+        
+        for (int i = 0; i < max_r; i++) {
+            for (int j = 0; j < max_c; j++) {
+                if(request.getParameter(i+","+j) != null)
+                {
+                    Posto p = new Posto();
+                    p.setIDsala(s.getIDsala());
+                    p.setRiga(i);
+                    p.setColonna(j);
+                    p.setEsiste(true);
+                    p.setPagato(false);
+                    
+                    String prezzo = "normale";
+                    if(n_studenti > 0)
+                    {
+                        prezzo = "studente";
+                        n_studenti--;
+                    }
+                    else if(n_ridotti > 0)
+                    {
+                        prezzo ="ridotto";
+                        n_ridotti--;
+                    }
+                    else if(n_militari > 0)
+                    {
+                        prezzo ="militare";
+                        n_militari--;
+                    }
+                    else if(n_disabili>0)
+                    {
+                        prezzo = "disabile";
+                        n_disabili--;
+                    }
+                    
+                    int id_prezzo;
+                    try{
+                         id_prezzo = dbm.getIDPrezzo(prezzo);
+                    }catch(SQLException sqlex)
+                    {
+                        id_prezzo = 1;
+                    }
+                    
+                    Prenotazione pre = new Prenotazione();
+                    try{
+                        pre.setPostoID(dbm.getIDPosto(sala.getId_sala(), i, j));
+                        p.setIDposto(pre.getPostoID());
+                    }catch(SQLException sqlex)
+                    {
+                        throw new RuntimeException("ID posto sbagliato");
+                    }
+                    pre.setPrezzo(id_prezzo);
+                    pre.setSpettacoloID(s.getIDspettacolo());
+                    
+                    if(u != null)
+                    {
+                        boolean b = dbm.AggiungiPrenotazione(u.getUserID(), s, id_prezzo, p);
+                        if(!b)
+                            forward_to(request, response, "/error.jsp");
+                    }
+                    
+                    prenotazioni.add(pre);
+                }
+            }
+        }
+        
+        request.getSession().setAttribute("lista_prenotazioni", prenotazioni);
+        request.getSession().setAttribute("return", "auth/payment.jsp");
+        
+        if(u!=null)
+        {
+            forward_to(request, response, "/auth/payment.jsp");
+            return;
+        }
+        else
+            forward_to(request, response, "/index.jsp");
+    }
+    
+    protected void addSpettacolo(HttpServletRequest request, HttpServletResponse response)
+    {
+        
+        int id_film = Integer.parseInt(request.getParameter("film"));
+        int id_sala = Integer.parseInt(request.getParameter("sala"));
+        String data = request.getParameter("data");
+        String ora = request.getParameter("ora");
+        
+       try{
+            Date dt = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").parse(data+" "+ora);
+            boolean creato = dbm.CreaSpettacolo(id_film, id_sala, new Timestamp(dt.getTime()));
+            if(creato)
+                forward_to(request, response, "/auth/admin/add_spettacolo.jsp?op=done");
+            else
+                forward_to(request, response, "/error.jsp");
+        }catch(ParseException pex)
+        {
+            forward_to(request, response, "/error.jsp");
+        }
+    }
+    
+    protected void logout(HttpServletRequest request, HttpServletResponse response)
+    {
+        request.getSession().setAttribute("user", null);
+        
+        forward_to(request, response, "/index.jsp");
+    }
+    
+    protected void gotoprenotazione(HttpServletRequest request, HttpServletResponse response)
+    {
         int id_spettacolo = Integer.parseInt(request.getParameter("id"));
         int id_posto = Integer.parseInt(request.getParameter("id_posto"));
         int id_prezzo = Integer.parseInt(request.getParameter("id_prezzo"));
         Spettacolo s = null;
-        
-         if(user == null)
-         {
-              forward_to(request, response, "/login.jsp");
-              return;
-         }
-           
+        Sala sala = null;
         
         try
         {
             //controllo che quello spettacolo esista
             s = dbm.getSpettacolo(id_spettacolo);
+            
+            sala = new Sala(dbm, s.getIDspettacolo());
+            sala.refreshMappa();
         }
         catch(SQLException sqlex)
         {
-            error(request, response);
-            return;
-        }
-        if(s == null)
-        {
-            error(request, response);
+            forward_to(request, response, "/error.jsp");
             return;
         }
         
-        Prenotazione p = new Prenotazione(user,id_spettacolo,id_prezzo,id_posto);
+        //CHIEDERE A IVAN
+        //Prenotazione p = new Prenotazione(user,id_spettacolo,id_prezzo,id_posto);
         
-        if(!dbm.InserisciPrenotazione(p)){
-            //inserimento prenotazione non è andato a buon fine
-            error(request,response);
-        }
-        
-        request.getSession().setAttribute("prenotazione",p);
-        request.getSession().setAttribute("spettacolo", s);
-        
+//        if(!dbm.InserisciPrenotazione(p)){
+//            //inserimento prenotazione non è andato a buon fine
+//            error(request,response);
+//        }
+//        
+//        request.getSession().setAttribute("prenotazione",p);
+//        request.getSession().setAttribute("spettacolo", s);
+//        
         forward_to(request, response, "/auth/prenotazione.jsp");
+        request.getSession().setAttribute("sala", sala);
+        forward_to(request, response, "/prenotazione.jsp");
     }
+    
     
     protected void locandina_film(HttpServletRequest request, HttpServletResponse response, int id_film)
     {
@@ -186,7 +374,7 @@ public class Controller extends HttpServlet {
         }
     }
     
-    protected void forward_to(HttpServletRequest request, HttpServletResponse response,String url)
+    void forward_to(HttpServletRequest request, HttpServletResponse response,String url)
     {
         try{
             request.getRequestDispatcher(url).forward(request, response);
@@ -260,6 +448,7 @@ public class Controller extends HttpServlet {
         
         try{
             dbm = new DBManager("jdbc:derby://localhost:1527/noPassword");
+            dbm = new DBManager(URL_DB);
         }
         catch(SQLException sqlex){
             log(sqlex.toString());
@@ -267,3 +456,4 @@ public class Controller extends HttpServlet {
     }
 
 }
+            

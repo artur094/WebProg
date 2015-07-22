@@ -1,12 +1,12 @@
---DROP TABLE prenotazione;
---DROP TABLE spettacolo;
---DROP TABLE posto;
---DROP TABLE utente;
---DROP TABLE film;
---DROP TABLE ruolo;
---DROP TABLE sala;
---DROP TABLE genere;
---DROP TABLE prezzo;
+DROP TABLE prenotazione;
+DROP TABLE spettacolo;
+DROP TABLE posto;
+DROP TABLE utente;
+DROP TABLE film;
+DROP TABLE ruolo;
+DROP TABLE sala;
+DROP TABLE genere;
+DROP TABLE prezzo;
 
 CREATE TABLE sala
 (
@@ -44,7 +44,7 @@ CREATE TABLE film
     id_genere int,
     url_trailer varchar(255),
     durata int,
-    trama varchar(1000),
+    trama varchar(10000),
     url_locandina varchar(255),
     constraint film_pk primary key (id_film),
     constraint film_genere_fk foreign key (id_genere) references genere(id_genere)
@@ -90,6 +90,7 @@ CREATE TABLE prenotazione
     id_spettacolo int,
     id_prezzo int,
     id_posto int,
+    pagato boolean DEFAULT false,
     data_ora_operazione timestamp,
     constraint prenotazione_pk primary key (id_prenotazione),
     constraint prenotazione_utente_fk foreign key (id_utente) references utente(id_utente),
@@ -98,19 +99,3 @@ CREATE TABLE prenotazione
     constraint prenotazione_posto_fk foreign key (id_posto) references posto(id_posto)
 );
 
-insert into ruolo (ruolo) values ('admin');
-insert into ruolo (ruolo) values ('user');
-
--- prova
-insert into genere (descrizione) values ('fantasy');
-insert into film (titolo, id_genere, url_trailer, durata, trama, url_locandina) values(
-        'Lord of the Rings: The Fellowship of the Ring',
-        1,
-        'https://www.youtube.com/watch?v=V75dMMIW2B4',
-        178,
-        'A meek hobbit of the Shire and eight companions set out on a journey to Mount Doom to destroy the One Ring and the dark lord Sauron.',
-        'http://www.imdb.com/title/tt0120737/');
-insert into sala (descrizione) values ('Sala con 50 posti a sedere');
-insert into spettacolo (id_film, data_ora, id_sala) values (1, '2015-08-10 21:30:00', 1);
-
-select * from spettacolo;

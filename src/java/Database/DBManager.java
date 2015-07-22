@@ -9,6 +9,8 @@ import Bean.Prenotazione;
 import Bean.Spettacolo;
 import Bean.Utente;
 import Bean.Film;
+import Bean.Posto;
+import Bean.Prezzo;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -48,6 +50,63 @@ public class DBManager implements Serializable {
         } catch (SQLException ex) {
             Logger.getLogger(DBManager.class.getName()).info(ex.getMessage());
         }
+    }
+    
+    public boolean cancellaPrenotazioniVecchieNonPagate()
+    {
+        try{
+            PreparedStatement ps = con.prepareStatement("DELETE FROM prenotazione WHERE data_ora_operazione < ? AND pagato = false");
+            Date dt = new Date();
+            dt.setMinutes(dt.getMinutes()-15);
+            ps.setTimestamp(1, new Timestamp(dt.getTime()));
+            ps.executeUpdate();
+            return true;
+        }catch(SQLException ex){
+            return false;
+        }
+    }
+    
+    public List<Posto> getPostiSala(int id_spettacolo)
+    {
+        List<Posto> posti = new ArrayList<>();
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT PRE.id_prenotazione, PRE.id_spettacolo,PO.id_posto, PO.riga, PO.colonna,PRE.pagato, PO.esiste FROM (posto as PO inner JOIN prenotazione as PRE ON PO.ID_POSTO = PRE.ID_POSTO), spettacolo as S WHERE PO.id_sala = S.id_sala AND PO.id_sala = S.id_sala AND S.ID_SPETTACOLO = ?");
+            
+            try
+            {
+                ps.setInt(1, id_spettacolo);
+
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    while (rs.next()) {
+                        Posto p = new Posto();
+                       
+                        p.setIDposto(rs.getInt("id_posto"));
+                        if(rs.getObject("id_prenotazione") == null)
+                            p.setIDPrenotazione(-1);
+                        else
+                            p.setIDPrenotazione(rs.getInt("id_prenotazione"));
+                        p.setIDsala(rs.getInt("id_spettacolo"));
+                        p.setEsiste(rs.getBoolean("esiste"));
+                        p.setPagato(rs.getBoolean("pagato"));
+                        p.setRiga(rs.getInt("riga"));
+                        p.setColonna(rs.getInt("colonna"));
+                        posti.add(p);
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        }catch(SQLException sqlex)
+        {
+            return null;
+        }
+        
+        return posti;
     }
     
     public Utente authenticate(String email, String password)
@@ -97,7 +156,7 @@ public class DBManager implements Serializable {
         
         //si, serve un timestamp o sql si lamenta
         java.sql.Timestamp dataTmp = new java.sql.Timestamp(giornoOra.getTime());
-        
+        dataTmp.setMinutes(dataTmp.getMinutes()+15);
         ps.setTimestamp(1,dataTmp);
         
         try
@@ -167,6 +226,42 @@ public class DBManager implements Serializable {
         return f;
     }
     
+    public List<Film> getFilms() throws SQLException
+    {
+        List<Film> lista = new ArrayList<Film>();
+        PreparedStatement ps = con.prepareStatement(
+                "SELECT id_film, titolo, url_trailer,durata, trama, url_locandina,descrizione FROM film AS f, genere AS G WHERE f.id_genere = g.id_genere");
+  
+        
+        try
+        {
+            ResultSet rs = ps.executeQuery();
+            
+            try{
+                while(rs.next())
+                {
+                    
+                    Film f = new Film();
+                    f.setDurata(rs.getInt("durata"));
+                    f.setGenere(rs.getString("descrizione"));
+                    f.setId_film(rs.getInt("id_film"));
+                    f.setTitolo(rs.getString("titolo"));
+                    f.setTrama(rs.getString("trama"));
+                    f.setUrl_locandina(rs.getString("url_locandina"));
+                    f.setUrl_trailer(rs.getString("url_trailer"));
+                    lista.add(f);
+                }
+                
+            }finally{
+                rs.close();
+            }
+        }finally{
+            ps.close();
+        }
+        
+        return lista;
+    }
+    
     public Spettacolo getSpettacolo(int id_spettacolo) throws SQLException
     {
         Spettacolo spect = null;
@@ -208,7 +303,6 @@ public class DBManager implements Serializable {
     }
     
     //creazione utente
-    
     public boolean CreaUtente(Utente u){
         try{
             PreparedStatement ps = con.prepareStatement("INSERT INTO utente(email,password,credito,id_ruolo) VALUES (?,?,?,?)");
@@ -233,7 +327,7 @@ public class DBManager implements Serializable {
             
             ps.setInt(1, p.getUtente().getUserID());
             ps.setInt(2, p.getSpettacoloID());
-            ps.setDouble(3, p.getPrezzo());
+            ps.setInt(3, p.getPrezzo());
             ps.setInt(4, p.getPostoID());      
             ps.setTimestamp(5, dataTmp);
             ps.executeUpdate();
@@ -243,7 +337,98 @@ public class DBManager implements Serializable {
         }
     }
     
+    public boolean AggiungiPrenotazione(int id_utente, Spettacolo s, int id_prezzo, Posto p){
+       try{
+            PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,CURRENT_TIMESTAMP)");
+            
+            ps.setInt(1, id_utente);
+            ps.setInt(2, s.getIDspettacolo());
+            ps.setInt(3, id_prezzo);
+            ps.setInt(4, p.getIDposto());      
+            ps.executeUpdate();
+            return true;  
+       }catch(SQLException ex){
+            return false;
+        }
+    }
+    
+    public List<Prenotazione> prenotazioniNonPagate(Utente u)
+    {
+        List<Prenotazione> prenotazioni = new ArrayList<Prenotazione>();
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT id_prenotazione, id_spettacolo, id_prezzo, id_posto, data_ora_operazione FROM prenotazione WHERE id_utente = ? AND pagato = false;");
+            
+            ps.setInt(1, u.getUserID());
+            
+            ResultSet rs = ps.executeQuery();
+            try{
+                while(rs.next())
+                {
+                    Prenotazione p = new Prenotazione();
+                    p.setUtente(u);
+                    p.setPrenotazioneID(rs.getInt("id_prenotazione"));
+                    p.setSpettacoloID(rs.getInt("id_spettacolo"));
+                    p.setPrezzo(rs.getInt("id_prezzo"));
+                    p.setPostoID(rs.getInt("id_posto"));
+                    p.setDataOraOperazione(new Date(rs.getTimestamp("data_ora_prenotazione").getTime()));
+
+                    prenotazioni.add(p);
+                }
+            }finally
+            {
+                rs.close();
+                ps.close();
+            }
+            
+        }catch(SQLException ex)
+        {
+            return null;
+        }
+        
+        return prenotazioni;
+    }
+    
+    public int getIDPrezzo(String prezzo) throws SQLException
+    {
+        PreparedStatement ps = con.prepareStatement("SELECT id_prezzo FROM prezzo WHERE tipo = ?");
+        ps.setString(1, prezzo);
+        ResultSet rs = ps.executeQuery();
+        try{
+            if(rs.next())
+            {
+                return rs.getInt("id_prezzo");
+            }
+        }finally{
+            rs.close();
+            ps.close();
+        }
+        return -1;
+    }
+    
+    public int getIDPosto(int id_sala, int i, int j) throws SQLException
+    {
+        PreparedStatement ps = con.prepareStatement("SELECT id_posto FROM posto WHERE id_sala = ? AND riga = ? AND colonna =?");
+        ps.setInt(1, id_sala);
+        ps.setInt(2, i);
+        ps.setInt(3, j);
+        
+        ResultSet rs = ps.executeQuery();
+        try{
+            if(rs.next())
+            {
+                return rs.getInt("id_posto");
+            }
+        }
+        finally
+        {
+            rs.close();
+            ps.close();
+        }
+        return -1;
+    }
+    
     //da testare
+    //da aggiungere il rimborso dell'80%
     //cancellare prenozatione
     public boolean CancellaPrenotazione(int IDprenotazione){
         try{
@@ -276,11 +461,340 @@ public class DBManager implements Serializable {
             PreparedStatement ps = con.prepareStatement("INSERT INTO spettacolo(id_film,data_ora,id_sala) VALUES (?,?,?)");
             ps.setInt(1,s.getIDfilm());
             ps.setTimestamp(2, new Timestamp(s.getOra().getTime()));
-            ps.setInt(3, s.getIDfilm());
+            ps.setInt(3, s.getIDsala());
             ps.executeUpdate();
             return true;
         }catch(SQLException ex){
             return false;
         } 
     }
+    
+    public boolean CreaSpettacolo(int id_film, int id_sala, Timestamp data){
+        try{
+            PreparedStatement ps = con.prepareStatement("INSERT INTO spettacolo(id_film,data_ora,id_sala) VALUES (?,?,?)");
+            ps.setInt(1,id_film);
+            ps.setTimestamp(2, data);
+            ps.setInt(3, id_sala);
+            ps.executeUpdate();
+            return true;
+        }catch(SQLException ex){
+            return false;
+        } 
+    }
+    
+    public boolean creaSale() throws SQLException
+    {
+        //Sala Parcheggio 50 posti 10c - 5r (c = colonne, r = righe)
+        //Sala Piscina 50 posti 10c - 5r
+        //Sala Nerd 80 posti 10c - 8r
+        //Sala Cuori 80 posti 10c - 8r
+        
+        List<Posto> lista;
+        int id;
+        
+        lista = getPosti("Sala Parcheggio");
+        id = getSalaID("Sala Parcheggio");
+        if(id<0)
+            return false;
+        creaSala(lista, id, 5, 10);
+        
+        lista = getPosti("Sala Piscina");
+        id = getSalaID("Sala Piscina");
+        if(id<0)
+            return false;
+        creaSala(lista, id, 5, 10);
+        
+        lista = getPosti("Sala Nerd");
+        id = getSalaID("Sala Nerd");
+        if(id<0)
+            return false;
+        creaSala(lista, id, 8, 10);
+        
+        lista = getPosti("Sala Cuori");
+        id = getSalaID("Sala Cuori");
+        if(id<0)
+            return false;
+        creaSala(lista, id, 8, 10);
+        
+        return true;
+    }
+    
+    public int getSalaID(String nome_sala) throws SQLException
+    {
+        PreparedStatement ps = con.prepareStatement("SELECT id_sala FROM sala WHERE descrizione = ?");
+        ps.setString(1, nome_sala);
+        
+        ResultSet rs = ps.executeQuery();
+        if(rs.next())
+        {
+            return rs.getInt("id_sala");
+        }
+        else return -1;
+ 
+    }
+    
+    private void creaSala(List<Posto> posti, int id_sala, int max_rows, int max_cols) throws SQLException
+    {
+        String[][] mappa = new String[max_rows][max_cols];
+        
+        for (int i = 0; i < max_rows; i++) {
+            for (int j = 0; j < max_cols; j++) {
+                mappa[i][j] = "X";
+            }
+        }
+        
+        for (int i = 0; i < posti.size(); i++) {
+            int x = posti.get(i).getRiga();
+            int y = posti.get(i).getColonna();
+            
+            mappa[x][y] = "O";
+        }
+        
+        for (int i = 0; i < max_rows; i++) {
+            for (int j = 0; j < max_cols; j++) {
+                if(mappa[i][j].equals("X"))
+                {
+                    PreparedStatement ps = con.prepareStatement("INSERT INTO posto(riga,colonna,esiste, id_sala) VALUES (?,?,?,?)");
+                    ps.setInt(1,i);
+                    ps.setInt(2, j);
+                    ps.setBoolean(3, true);
+                    ps.setInt(4, id_sala);
+                    ps.executeUpdate();
+                }
+            }
+        }
+    }
+    
+    
+    public List<Posto> getPosti(String sala) throws SQLException
+    {
+        List<Posto> lista = new ArrayList<Posto>();
+        
+        PreparedStatement ps = con.prepareStatement("SELECT id_posto, riga, colonna, esiste FROM posto as P, sala as S WHERE P.id_sala = S.id_sala AND S.descrizione = ?");
+            
+            try
+            {
+                ps.setString(1, sala);
+
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    while (rs.next()) {
+                        Posto p = new Posto();
+                        p.setIDposto(rs.getInt("id_posto"));
+                        p.setEsiste(rs.getBoolean("esiste"));
+                        p.setRiga(rs.getInt("riga"));
+                        p.setColonna(rs.getInt("colonna"));
+                        lista.add(p);
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        return lista;
+    }
+    
+    public List<Posto> getPosti(int id_spettacolo) throws SQLException
+    {
+        List<Posto> lista = new ArrayList<Posto>();
+        
+        PreparedStatement ps = con.prepareStatement("SELECT id_posto, riga, colonna, esiste FROM posto as P, spettacolo as S WHERE P.id_sala= S.id_sala AND S.id_spettacolo = ?");
+            
+            try
+            {
+                ps.setInt(1,id_spettacolo);
+
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    while (rs.next()) {
+                        Posto p = new Posto();
+                        p.setIDposto(rs.getInt("id_posto"));
+                        p.setEsiste(rs.getBoolean("esiste"));
+                        p.setRiga(rs.getInt("riga"));
+                        p.setColonna(rs.getInt("colonna"));
+                        lista.add(p);
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        return lista;
+    }
+    
+    public List<Prenotazione> getPrenotazioniNonPagate(int user_id)
+    {
+        cancellaPrenotazioniVecchieNonPagate();
+        
+        List<Prenotazione> lista = new ArrayList<Prenotazione>();
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT id_prenotazione, id_utente, id_spettacolo, id_prezzo, id_posto, data_ora_operazione FROM prenotazione WHERE id_utente = ? AND pagato = false");
+            
+            try
+            {
+                ps.setInt(1, user_id);
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    while (rs.next()) {
+                        Prenotazione p = new Prenotazione();
+                        
+                        p.setDataOraOperazione(new Date(rs.getTimestamp("data_ora_operazione").getTime()));
+                        p.setPostoID(rs.getInt("id_posto"));
+                        p.setPrezzo(rs.getInt("id_prezzo"));
+                        p.setSpettacoloID(rs.getInt("id_spettacolo"));
+                        p.setPrenotazioneID(rs.getInt("id_prenotazione"));
+                        p.setUtente(getUtente(user_id));
+                       
+                        lista.add(p);
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        }catch(SQLException sqlex)
+        {
+            return null;
+        }
+        
+        return lista;
+    }
+    
+    public Utente getUtente(int id_utente)
+    {
+        Utente u = null;
+        
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT email, credito, ruolo FROM utente as u, ruolo as r WHERE id_utente = ? AND r.id_ruolo = u.id_ruolo");
+            
+            try
+            {
+                ps.setInt(1, id_utente);
+                
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    if (rs.next()) {
+                        u = new Utente();
+                        
+                        u.setEmail(rs.getString("email"));
+                        u.setCredito(rs.getInt("credito"));
+                        u.setRuolo(rs.getString("ruolo"));
+                        u.setUserID(id_utente);
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        }catch(SQLException sqlex)
+        {
+            return null;
+        }
+        
+        return u;
+    }
+    
+    public Posto getPosto(int id_posto)
+    {
+        Posto p = null;
+        
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT id_sala, riga, colonna, esiste FROM posto WHERE id_posto = ?");
+            
+            try
+            {
+                ps.setInt(1, id_posto);
+                
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    if (rs.next()) {
+                        p = new Posto();
+                        
+                        p.setIDposto(id_posto);
+                        p.setColonna(rs.getInt("colonna"));
+                        p.setRiga(rs.getInt("riga"));
+                        p.setEsiste(rs.getBoolean("esiste"));
+                        p.setIDsala(rs.getInt("id_sala"));
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        }catch(SQLException sqlex)
+        {
+            return null;
+        }
+        
+        return p;
+    }
+    
+    public Prezzo getPrezzo(int id_prezzo)
+    {
+        Prezzo p = null;
+        
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT tipo, prezzo FROM prezzo WHERE id_prezzo = ?");
+            
+            try
+            {
+                ps.setInt(1, id_prezzo);
+                
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    if (rs.next()) {
+                        p = new Prezzo();
+                        p.setId_prezzo(id_prezzo);
+                        p.setPrezzo(rs.getDouble("prezzo"));
+                        p.setTipo(rs.getString("tipo"));
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        }catch(SQLException sqlex)
+        {
+            return null;
+        }
+        
+        return p;
+    }
+    
+    public boolean setPrenotazionePagata(int id_prenotazione)
+    {
+        try{
+            PreparedStatement ps = con.prepareStatement("UPDATE prenotazione SET pagato = true WHERE id_prenotazione = ?");
+            
+            ps.setInt(1, id_prenotazione);
+    
+            ps.executeUpdate();
+            return true;  
+       }catch(SQLException ex){
+            return false;
+        }
+    }
+    
+    
 }
+
+
+

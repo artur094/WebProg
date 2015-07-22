@@ -8,38 +8,29 @@ package Bean;
 import Database.DBManager;
 import Servlet.Controller;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 
 /**
  *
  * @author ivanmorandi
  */
-public class Spettacoli {
-    DBManager dbm;
-    public Spettacoli()
+public class Films {
+    private List<Film> lista;
+    private DBManager dbm;
+    
+    public Films()
     {
         try{
             dbm = new DBManager(Controller.URL_DB);
-        }
-        catch(SQLException sqlex){
+        }catch(SQLException sqlex)
+        {
             
         }
     }
     
-    public Spettacoli(DBManager dbm)
+    public List<Film> getFilms() throws SQLException
     {
-        super();
-        this.dbm = dbm;
-    }
-    
-    public List<Spettacolo> getSpettacoli(Date data)
-            throws SQLException
-    {
-        List<Spettacolo> lista = null;
-        
-        lista = dbm.getSpettacoli(data);
-        
+        lista = dbm.getFilms();
         return lista;
     }
 }
