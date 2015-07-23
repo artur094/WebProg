@@ -22,6 +22,10 @@ public class Film {
     private Integer durata;
     private String trama;
     private String url_locandina;
+    private String nome_Sala;
+    private String regista;
+    private String attori;
+    private String frase;
     
     public Film(){}
     
@@ -33,7 +37,40 @@ public class Film {
         
         return f;
     }
+
+    public String getRegista() {
+        return regista;
+    }
+
+    public void setRegista(String regista) {
+        this.regista = regista;
+    }
+
+    public String getAttori() {
+        return attori;
+    }
+
+    public void setAttori(String attori) {
+        this.attori = attori;
+    }
+
+    public String getFrase() {
+        return frase;
+    }
+
+    public void setFrase(String frase) {
+        this.frase = frase;
+    }
+
     
+    
+    public String getNome_Sala() {
+        return nome_Sala;
+    }
+
+    public void setNome_Sala(String nome_Sala) {
+        this.nome_Sala = nome_Sala;
+    }
     
     public Integer getId_film() {
         return id_film;

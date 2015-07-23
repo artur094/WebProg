@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -100,6 +101,9 @@ public class Controller extends HttpServlet {
                 break;
             case "validazione":
                 valida(request,response);
+                break;
+            case "confermaPrivacy":
+                confermaPrivacy(request,response);
                 break;
             default:
                 forward_to(request, response, "/error.jsp");
@@ -365,6 +369,13 @@ public class Controller extends HttpServlet {
         }else{
             forward_to(request,response,"/error.jsp");
         }
+    }
+    
+    private void confermaPrivacy(HttpServletRequest request, HttpServletResponse response) {
+        Cookie c = new Cookie("privacy","true");
+        c.setMaxAge(50*24*3600);
+        c.setPath("/");
+        response.addCookie(c);
     }
     
     void forward_to(HttpServletRequest request, HttpServletResponse response,String url)

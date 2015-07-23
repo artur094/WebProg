@@ -24,13 +24,13 @@ public class Films {
             dbm = new DBManager(Controller.URL_DB);
         }catch(SQLException sqlex)
         {
-            
+           System.out.println(sqlex);
         }
     }
     
     public List<Film> getFilms() throws SQLException
     {
-        lista = dbm.getFilms();
+        lista = dbm.getFilmSingoli();
         return lista;
     }
 }

@@ -11,7 +11,7 @@ body {
   font-family: 'Titillium Web', sans-serif;
 }
 
-a {
+a {F
   text-decoration: none;
   color: #1ab188;
   -webkit-transition: .5s ease;
@@ -117,7 +117,7 @@ label.highlight {
   color: #ffffff;
 }
 
-input, textarea {
+.form input, textarea {
   font-size: 22px;
   display: block;
   width: 100%;
@@ -136,7 +136,7 @@ input:focus, textarea:focus {
   border-color: #1ab188;
 }
 
-textarea {
+.form textarea {
   border: 2px solid #a0b3b0;
   resize: vertical;
 }

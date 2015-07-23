@@ -10,7 +10,7 @@
     </servlet>
     <servlet>
         <servlet-name>GenQR</servlet-name>
-        <servlet-class>Servlet.GeneratoreQR</servlet-class>
+        <servlet-class>Servlet.Test.GeneratoreQR</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>TestDBManager</servlet-name>

@@ -7,7 +7,7 @@ $(document).ready(function() {
     //containTabPrezzi   containTabInfo   containTabOrariContatti containTabSale containTabPreview   
     var showIndex=0;
     
-    $('#linkTabs span').on('click',function(){
+    $('#LinkTabs span').on('click',function(){
         //alert('show='+showIndex + "   --   index="+$(this).index());
         if(showIndex == $(this).index())
         {
@@ -15,9 +15,9 @@ $(document).ready(function() {
         }
         else
         {                         $('#contieniContainer').children().eq(showIndex).stop(true,true).fadeOut(100,function(){});
-            $('#linkTabs span').eq(showIndex).removeClass('activeTab');
+            $('#LinkTabs span').eq(showIndex).removeClass('activeTab');
             showIndex = $(this).index();
-            $('#contieniContainer').children().eq(showIndex).delay(50).fadeIn(100,function(){});
+            $('#contieniContainer').children().eq(showIndex).delay(250).fadeIn(100,function(){});
             $(this).addClass('activeTab');
         }
     });

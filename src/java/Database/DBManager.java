@@ -163,6 +163,31 @@ public class DBManager implements Serializable {
         }
     }
     
+    public List<Film> getFilmSingoli() throws SQLException{
+        List<Film> listFilm = new ArrayList<Film>();
+        try{
+        PreparedStatement ps = con.prepareStatement("select Z.DESCRIZIONE,F.TITOLO,F.DURATA,F.TRAMA,F.FRASE,F.REGISTA,F.ATTORI,G.DESCRIZIONE AS GENERE \n" +
+"from (SELECT T.DESCRIZIONE,S.ID_FILM FROM sala T, spettacolo S WHERE T.id_sala = S.id_sala) AS Z,film F, genere G\n" +
+"WHERE F.ID_FILM = Z.ID_FILM AND F.ID_GENERE = G.ID_GENERE");
+        ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                Film f = new Film();
+                f.setDurata(rs.getInt("durata"));
+                f.setTitolo(rs.getString("titolo"));
+                f.setGenere(rs.getString("genere"));
+                f.setTrama(rs.getString("trama"));
+                f.setNome_Sala(rs.getString("descrizione"));
+                f.setAttori((rs.getString("attori")));
+                f.setRegista(rs.getString("regista"));
+                f.setFrase(rs.getString("frase"));
+                listFilm.add(f);
+            }
+            
+        }catch(SQLException ex){
+            System.out.println(ex);
+        }
+        return listFilm;
+    }
     /**
      * Ritorna una lista degli spettacoli presenti in quella data
      * @param giornoOra giorno e ora degli spettacoli che volgio ottenere
@@ -171,7 +196,7 @@ public class DBManager implements Serializable {
     {
         List<Spettacolo> listSpettacoli = new ArrayList<Spettacolo>();
         PreparedStatement ps = con.prepareStatement(
-                "SELECT S.id_spettacolo, S.id_film, titolo ,url_trailer,url_locandina,durata,trama,data_ora,g.descrizione AS genere,sa.descrizione AS sala\n" +
+                "SELECT S.id_spettacolo, S.id_film, titolo ,url_trailer,url_locandina,durata,trama,data_ora,F.regista,F.frase,F.attori,g.descrizione AS genere,sa.descrizione AS sala\n" +
 "                        FROM spettacolo AS S,film AS F, genere AS G,sala AS SA \n" +
 "                        WHERE S.id_film = F.id_film AND G.id_genere = F.id_genere AND S.id_sala = SA.id_sala AND data_ora >= ?");
         
@@ -250,6 +275,8 @@ public class DBManager implements Serializable {
         }
         return f;
     }
+    
+
     
     /**
      *Ritorna tutti i film contenuti nel DB
@@ -544,7 +571,6 @@ public class DBManager implements Serializable {
     
     /**
      *Effettua il rimborso di una prenotazione, dato il suo ID. Calcola da sè l'80% del prezzo
-     *
      *
      */
     public boolean CancellaPrenotazione(int IDprenotazione){

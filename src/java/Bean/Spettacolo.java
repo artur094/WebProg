@@ -20,11 +20,37 @@ public class Spettacolo {
     private String urlLocandina;
     private Date ora;
     private String sala;
+    private String regista;
+    private String attori;
+    private String frase;
     //i campi qui sotto forse vanno cancellati, attenzione perchè vengono usati nel dbManager
     private int IDfilm;
     private int IDsala;
     private int IDspettacolo;
-    
+
+    public String getRegista() {
+        return regista;
+    }
+
+    public void setRegista(String regista) {
+        this.regista = regista;
+    }
+
+    public String getAttori() {
+        return attori;
+    }
+
+    public void setAttori(String attori) {
+        this.attori = attori;
+    }
+
+    public String getFrase() {
+        return frase;
+    }
+
+    public void setFrase(String frase) {
+        this.frase = frase;
+    }
     
     public int getIDsala() {
         return IDsala;
@@ -59,15 +85,18 @@ public class Spettacolo {
         this.sala = sala;
     }
     
-    public Spettacolo(int filmID, String titolo, String genere, String urlTrailer, int durata, String trama, String urlLocandina) {
+    public Spettacolo(int filmID, String titolo, String genere, String urlTrailer, int durata, String trama, String urlLocandina,String regista,String attori, String frase) {
         this.titolo = titolo;
         this.genere = genere;
         this.urlTrailer = urlTrailer;
         this.durata = durata;
         this.trama = trama;
         this.urlLocandina = urlLocandina;
+        this.regista = regista;
+        this.attori = attori;
+        this.frase = frase;
     }
-
+    
     public Spettacolo(){}
     
     public String getTitolo() {

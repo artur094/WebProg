@@ -1,7 +1,13 @@
 body{
     margin: 0px;
     min-width: 700px !important;
+    background-color: black !important;
 }
+
+body > div{
+//overflow: hidden !important;
+}
+
 header{
     background-color: black;
     height:100px;
@@ -75,7 +81,7 @@ display: table-cell;
     text-decoration: none;
 }
 
-.btnLogout{  // <!-- background in stylegradienti -->
+.btnLogout{   <!-- background in stylegradienti -->
     font: inherit;
     vertical-align: baseline;
     margin-left : 80%;
@@ -103,12 +109,13 @@ table, th, td {
 
 .zonatab{
     display: table; 
-    block-position: relative;
+    block position: relative;
     width: 100%;
     height: 300px;
     background-color: bisque; 
     padding-top: 400px;
     min-width: 700px;
+    overflow-y: hidden;
 }
 
 #LinkTabs {
@@ -133,19 +140,25 @@ table, th, td {
 
 #contieniContainer{
     position: relative;
+    //height: 100%;
     display: block;
     clear: both;
     width: 100%;
-    min-height: 600px; /* 350px + 25px (padding sx) + 25px (padding dx) */
+    //min-height: 600px; /* 350px + 25px (padding sx) + 25px (padding dx) */
     color: #222;
+    overflow-y: hidden;
 }
 
 #contieniContainer > div{
-    min-height: 600px;
+    position: relative;
+    //min-height: 1000px;
+    //height: auto;
     width: 100%;
     padding-left: 10%;
     padding-right: 10%;
     padding-top: 40px;
+    overflow-y: hidden;
+    z-index: 2;
 }
 
 #containTab{
@@ -160,58 +173,60 @@ table, th, td {
     width: 100%;
     min-height: 600px;
     line-height: 22px;
+    overflow-y: hidden;
 }
 
 .backgroundTab{
     position: absolute;
+    height: 100%;
     top: 0px;
     left: 0px;
     //margin-left: -10%;
     min-width: 100%;
-    min-height: 100%;
-    background-repeat: no-repeat;
+    //min-height: 100%;
+    background-repeat: repeat;
     background-size: cover;
     background-image: url(pattern1.jpg);
     opacity: 0.15;
-    z-index: 1
+    z-index: 0;
 }
 
 .txtTab{
     z-index: 10;
 }
 
-#containTabPrezzi{ //  <!-- background in stylegradienti -->
+#containTabPrezzi{   <!-- background in stylegradienti -->
     position: absolute;
     display:none;
     //z-index: 2;
     top:0px;
 }
-#containTabInfo{  // <!-- background in stylegradienti -->
+#containTabInfo{   <!-- background in stylegradienti -->
     position: absolute;
     display:none;
      //   z-index: 3;
     top:0px;
 }
 
-#containTabOrariContatti{ // <!-- background in stylegradienti -->
+#containTabOrariContatti{  <!-- background in stylegradienti -->
     position: absolute;
     display: none;
      //   z-index: 4;
     top:0px;
 }
-#containTabSale{  // <!-- background in stylegradienti -->
+#containTabSale{   <!-- background in stylegradienti -->
     position: absolute;
     display: none;
         z-index: 5;
     top:0px;
 }
-#containTabPreview{ //<!-- background in stylegradienti -->
+#containTabPreview{ <!-- background in stylegradienti -->
     position: absolute;
     display: block;
      //   z-index: 6;
     top:0px;
 }
-#containTabFilm{ //<!-- background in stylegradienti -->
+#containTabFilm{ <!-- background in stylegradienti -->
     position: absolute;
     display: none;
     //    z-index: 7;
@@ -225,11 +240,144 @@ table, th, td {
 }
 
 footer{
+    position: relative;
+    display: block;
     background-color: black;
     color:white;
     text-align: center;
+    z-index: 20;
+    box-sizing: content-box;
 }
 
 .form{
 display:block;
+}
+
+.txtLeft{
+    //width: 800px;
+    font-size: 20px;
+    float: left;
+}
+
+.txtRight{
+    font-size: 20px;
+    float: left;
+}
+
+.imgRounded{
+    border-radius: 50%;
+    shape-outside: circle(50%);
+    margin-top: 10px;
+    width: 250px;
+    height: 250px;
+  shape-image-threshold: 0.5;
+
+}
+
+.imgRight{
+  float: right;
+}
+
+.imgLeft{
+    margin-right: 10px;
+  float: left;
+}
+
+.filmCol1{
+    left: 0px;
+    float: left;
+}
+
+.filmCol2{
+    //top: 60px;
+    float: left;
+}
+
+.filmIndex{
+    width: 50%;
+    position: relative;
+    margin-bottom: 120px;
+    display: inline-block;
+    z-index: 2;
+}
+
+.locandinaIndex{
+    height: 200px;
+    float: left;
+}
+
+.infoFilmIndex{
+    float: left;
+    margin-left: 30px;
+    margin-top: -20px;
+}
+
+.infoFilmIndex td {
+    min-width: 70px;
+}
+
+.btnScheda{
+    position: relative;
+    top: 20px;
+    //left: 12%;
+    //left: 90px;
+    
+    background: #fc7f12;
+    background-image: -webkit-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: -moz-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: -ms-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: -o-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: linear-gradient(to bottom, #fc7f12, #d44b1a);
+    -webkit-border-radius: 5;
+    -moz-border-radius: 5;
+    border-radius: 5px;
+    font-family: Arial;
+    color: #ffffff;
+    font-size: 17px;
+    padding: 7px 10px 7px 10px;
+    text-decoration: none;
+}
+
+.btnScheda:hover{
+    color: white;
+    background: #d44b1a;
+    background-image: -webkit-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: -moz-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: -ms-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: -o-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: linear-gradient(to bottom, #d44b1a, #fc7f12);
+    text-decoration: none;
+}
+.btnPrenota{
+    position: relative;
+    top: 20px;
+    margin-left: 10px;
+    //left: 12%;
+    //left: 90px;
+    
+    background: #fc7f12;
+    background-image: -webkit-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: -moz-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: -ms-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: -o-linear-gradient(top, #fc7f12, #d44b1a);
+    background-image: linear-gradient(to bottom, #fc7f12, #d44b1a);
+    -webkit-border-radius: 5;
+    -moz-border-radius: 5;
+    border-radius: 5px;
+    font-family: Arial;
+    color: #ffffff;
+    font-size: 17px;
+    padding: 7px 10px 7px 10px;
+    text-decoration: none;
+}
+
+.btnPrenota:hover{
+    color: white;
+    background: #d44b1a;
+    background-image: -webkit-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: -moz-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: -ms-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: -o-linear-gradient(top, #d44b1a, #fc7f12);
+    background-image: linear-gradient(to bottom, #d44b1a, #fc7f12);
+    text-decoration: none;
 }
