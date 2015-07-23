@@ -16,7 +16,7 @@ import javax.mail.internet.*;
  *
  * @author Paolo
  */
-public class Email {
+public class ValidationEmail {
     
     String serverEmail;
     String hostEmail;
@@ -24,14 +24,28 @@ public class Email {
     String indirizzoDestinatario;
     String testo;
     
-    public Email(){}
+    public ValidationEmail(){}
 
-    public Email(String serverEmail, String hostEmail, String indirizzoDestinatario,String indirizzoMittente , String testo) {
-        this.serverEmail = serverEmail;
-        this.hostEmail = hostEmail;
+    /**
+     * Metodo di convenienza, crea già un testo di default con il codice di autenticazione dato
+     */
+    public ValidationEmail(String indirizzoDestinatario, double codiceValidazione){
+        this.indirizzoDestinatario = indirizzoDestinatario;
+        
+        StringBuilder s = new StringBuilder();
+        s.append("Ciao! Abbiamo bisogno che confermi la tua email per usare Cineland; clicca su questo link. Se non riesci a cliccarlo, copialo e incollalo nella barra degli indirizzi");
+        s.append(" http://localhost:8084/CineLand/Controller?codiceVal=");
+        s.append(codiceValidazione);
+        s.append("&email=");
+        s.append(indirizzoDestinatario);
+        s.append("&op=validazione");
+        
+        testo = s.toString();
+    }
+    
+    public ValidationEmail(String indirizzoDestinatario,String testo) {
         this.indirizzoDestinatario = indirizzoDestinatario;
         this.testo = testo;
-        this.indirizzoMittente = indirizzoMittente;
     }
     
     /**
@@ -53,21 +67,19 @@ public class Email {
             
             Authenticator auth = new SMTPAuthenticator();
             Session session = Session.getDefaultInstance(props,auth);
-            String msgBody = "....hi! I'm made of potatoes";
+            String msgBody = testo;
             
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress("progettoWeb94@gmail.com"));
-            msg.addRecipient(Message.RecipientType.TO,new InternetAddress("luca.bazzanella-2@studenti.unitn.it", "Paolo"));
-            msg.setSubject("Email di conferma Posto");
+            msg.addRecipient(Message.RecipientType.TO,new InternetAddress(indirizzoDestinatario));
+            msg.setSubject("Email di Conferma Posto; no reply");
             msg.setText(msgBody);
            
             Transport.send(msg);
             
         } catch (MessagingException e) {
+            System.out.println(e.toString());
             e.printStackTrace(); // USARE LOG4J!!!
-        }
-        catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(Email.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

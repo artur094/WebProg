@@ -5,6 +5,7 @@
  */
 package Servlet;
 
+import Bean.ValidationEmail;
 import Bean.Film;
 import Bean.Pagamento;
 import Bean.Posto;
@@ -15,7 +16,6 @@ import Bean.Spettacolo;
 import Bean.Utente;
 import Database.DBManager;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -23,14 +23,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.derby.client.am.DateTime;
-import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 
 /**
  *
@@ -101,6 +97,9 @@ public class Controller extends HttpServlet {
                 {
                     forward_to(request, response, "/error.jsp");
                 }
+                break;
+            case "validazione":
+                valida(request,response);
                 break;
             default:
                 forward_to(request, response, "/error.jsp");
@@ -287,17 +286,6 @@ public class Controller extends HttpServlet {
             forward_to(request, response, "/error.jsp");
             return;
         }
-        
-        //CHIEDERE A IVAN
-        //Prenotazione p = new Prenotazione(user,id_spettacolo,id_prezzo,id_posto);
-        
-//        if(!dbm.InserisciPrenotazione(p)){
-//            //inserimento prenotazione non è andato a buon fine
-//            error(request,response);
-//        }
-//        
-//        request.getSession().setAttribute("prenotazione",p);
-//        request.getSession().setAttribute("spettacolo", s);
 //        
         forward_to(request, response, "/auth/prenotazione.jsp");
         request.getSession().setAttribute("sala", sala);
@@ -329,7 +317,6 @@ public class Controller extends HttpServlet {
         
         user = dbm.authenticate(email, password);
         
-        
         // se qualcosa è andato storto... 
         // o email-password sbagliata
         // o altri errori
@@ -341,7 +328,7 @@ public class Controller extends HttpServlet {
         else
         {
             request.getSession().setAttribute("user", user);
-            forward_to(request, response, "/accountPage.jsp");
+            forward_to(request, response, "/auth/accountPage.jsp");
         }
     }
     
@@ -354,16 +341,30 @@ public class Controller extends HttpServlet {
         u.setRuolo("user");
         
         double codiceEsito = dbm.CreaUtente(u);
-        
+        //se la creazione è andata a buon fine
         if(codiceEsito != -1)
         {
-            dbm.AttivaUtente(u, codiceEsito); //DEBUG
+            ValidationEmail conferma = new ValidationEmail(email,codiceEsito); 
+            conferma.Invia();
             request.getSession().setAttribute("user", u);
-            forward_to(request, response, "/auth/user_profile.jsp");
+            forward_to(request, response, "/auth/accountPage.jsp");
         }else{
-            forward_to(request, response, "/registrazione.html");
+            forward_to(request, response, "/index(diverso).html");
         }
         
+    }
+    
+    private void valida(HttpServletRequest request, HttpServletResponse response) {
+        String email = request.getParameter("email");
+        double codice = Double.parseDouble(request.getParameter("codiceVal"));
+        if(request.getSession().getAttribute("user")!=null){
+            Utente u = (Utente)request.getSession().getAttribute("user");
+            if(u.getEmail().equals(email)){
+                dbm.AttivaUtente(u, codice);
+            }
+        }else{
+            forward_to(request,response,"/error.jsp");
+        }
     }
     
     void forward_to(HttpServletRequest request, HttpServletResponse response,String url)

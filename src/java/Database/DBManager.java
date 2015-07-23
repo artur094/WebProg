@@ -1,7 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @author Paolo Chistè
+ * Gestore del database.
  */
 package Database;
 
@@ -21,17 +20,20 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
-
+//il campo author vale per tutte le funzioni qui sotto, non avevo voglia di riscriverlo
 /**
  *
- * @author ivanmorandi
+ * @author ivanmorandi, Paolo Chistè
  */
 public class DBManager implements Serializable {
     private transient Connection con; //transient non viene serializzato
     
+    /**
+     * Costruttore; inizializza una connessione al DB
+     *@param dburl URL del database a cui connettersi; l'username e la password devono essere root e root
+     */
     public DBManager(String dburl) throws SQLException{
         try{
             Class.forName("org.apache.derby.jdbc.ClientDriver", true, getClass().getClassLoader());
@@ -45,6 +47,9 @@ public class DBManager implements Serializable {
         this.con = con;
     }
     
+    /**
+     * Chiude la connessione al DB
+     */
     public static void shutdown() {
         try {
             DriverManager.getConnection("jdbc:derby:;shutdown=true");
@@ -53,6 +58,9 @@ public class DBManager implements Serializable {
         }
     }
     
+    /**
+     * Come dal nome; cancella le prenotazioni non pagate, la cui data è minore della data odierna.
+     */
     public boolean cancellaPrenotazioniVecchieNonPagate()
     {
         try{
@@ -67,6 +75,9 @@ public class DBManager implements Serializable {
         }
     }
     
+    /**
+     * @param id_spettacolo id dello spettacolo di cui si vogliono sapere i posti liberi
+     */
     public List<Posto> getPostiSala(int id_spettacolo)
     {
         List<Posto> posti = new ArrayList<>();
@@ -110,6 +121,11 @@ public class DBManager implements Serializable {
         return posti;
     }
     
+    /**
+     * Autentica un utente nel database; se ha successo, ritorna un Utente con tutti i dati che ha
+     * @param email email dell'utente
+     * @param password password dell'utente
+     */
     public Utente authenticate(String email, String password)
     {
         try{
@@ -147,6 +163,10 @@ public class DBManager implements Serializable {
         }
     }
     
+    /**
+     * Ritorna una lista degli spettacoli presenti in quella data
+     * @param giornoOra giorno e ora degli spettacoli che volgio ottenere
+     */
     public List<Spettacolo> getSpettacoli(Date giornoOra) throws SQLException
     {
         List<Spettacolo> listSpettacoli = new ArrayList<Spettacolo>();
@@ -192,6 +212,10 @@ public class DBManager implements Serializable {
         return listSpettacoli;
     }
     
+    /**
+     * Ritorna un film che possiede quell'id
+     *@param id_film id del film che voglio ottenere
+     */
     public Film getFilm(int id_film) throws SQLException
     {
         Film f = null;
@@ -227,6 +251,9 @@ public class DBManager implements Serializable {
         return f;
     }
     
+    /**
+     *Ritorna tutti i film contenuti nel DB
+     */
     public List<Film> getFilms() throws SQLException
     {
         List<Film> lista = new ArrayList<Film>();
@@ -263,6 +290,10 @@ public class DBManager implements Serializable {
         return lista;
     }
     
+     /**
+     *Ritorna tutti gli spettacoli contenuti nel DB
+     */
+   
     public Spettacolo getSpettacolo(int id_spettacolo) throws SQLException
     {
         Spettacolo spect = null;
@@ -303,7 +334,11 @@ public class DBManager implements Serializable {
         return spect;
     }
     
-       //creazione utente
+     /**
+     *Crea un utente e lo inserisce nel DB. L'attivazione dell'utente viene segnata come FALSE; tale utente andrà attivato con AttivaUtente. Ritorna il codice necessario ad attivarlo, che viene anche salvato nel DB
+     *@return Codice necessario ad attivare l'utente; è lo stesso che è salvato nel db, nel campo codice_attivazione della entry relativa a quell'utente
+     */
+   
     public double CreaUtente(Utente u){
         try{
             PreparedStatement ps = con.prepareStatement("INSERT INTO utente(email,password,credito,id_ruolo,verificato,codice_attivazione) VALUES (?,?,?,?,?,?)");
@@ -316,6 +351,7 @@ public class DBManager implements Serializable {
             ps.setBoolean(5, false);
             ps.setDouble(6, codiceAttivazione);
             ps.executeUpdate();
+         
             return codiceAttivazione;
         }catch(SQLException ex){
             return -1;
@@ -339,27 +375,37 @@ public class DBManager implements Serializable {
 //        }
 //    }
     
-    //verifica la email dell'utente e lo abilita
+     /**
+     *Se il codiceAttivazione corrisponde a quello nel DB, l'utente viene abilitato
+     */
     public boolean AttivaUtente(Utente u,double codiceAttivazione){
         try{
             
-            PreparedStatement ps = con.prepareStatement("SELECT id_attivazione FROM utente WHERE id_utente = ?");
-            ps.setInt(1, u.getUserID());
+            PreparedStatement ps = con.prepareStatement("SELECT codice_attivazione FROM utente WHERE email = ?");
+            ps.setString(1, u.getEmail());
             ResultSet rs = ps.executeQuery();
-            int codice = rs.getInt("id_attivazione");
-            if (codice == codiceAttivazione){
-                PreparedStatement psAttivazione = con.prepareStatement("UPDATE SPETTACOLO SET verificato = 'true'");
-                int righeModificate = psAttivazione.executeUpdate();
-                if(righeModificate == 1)
-                    return true;
+            if(rs.next()){
+            int codice = rs.getInt("codice_attivazione");
+            int debug = 0;
+                if (codice == codiceAttivazione){
+                    PreparedStatement psAttivazione = con.prepareStatement("UPDATE utente SET verificato = ? WHERE email = ?");
+                    psAttivazione.setBoolean(1, true);
+                    psAttivazione.setString(2,u.getEmail());
+                    int righeModificate = psAttivazione.executeUpdate();
+                    if(righeModificate == 1)
+                        return true;
+                }
             }
             return false;
         }catch(SQLException ex){
+            System.out.println(ex.toString());
             return false;
         }
     }
     
-    //da testare
+    /**
+     *Inserisce una prenotazione nel DB.
+     */
     public boolean InserisciPrenotazione(Prenotazione p){
        try{
             PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,?)");
@@ -378,6 +424,9 @@ public class DBManager implements Serializable {
         }
     }
     
+    /**
+     *Inserisce una prenotazione nel DB.
+     */
     public boolean AggiungiPrenotazione(int id_utente, Spettacolo s, int id_prezzo, Posto p){
        try{
             PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,CURRENT_TIMESTAMP)");
@@ -393,6 +442,9 @@ public class DBManager implements Serializable {
         }
     }
     
+    /**
+     *Ritorna tutte le prenotazioni non pagate da un certo utente.
+     */
     public List<Prenotazione> prenotazioniNonPagate(Utente u)
     {
         List<Prenotazione> prenotazioni = new ArrayList<Prenotazione>();
@@ -490,16 +542,37 @@ public class DBManager implements Serializable {
         return -1;
     }
     
-    //da testare
-    //da aggiungere il rimborso dell'80%
-    //cancellare prenozatione
+    /**
+     *Effettua il rimborso di una prenotazione, dato il suo ID. Calcola da sè l'80% del prezzo
+     *
+     *
+     */
     public boolean CancellaPrenotazione(int IDprenotazione){
         try{
-            PreparedStatement ps = con.prepareStatement("DELETE * FROM prenotazione WHERE id_prenotazione = ?");
-            ps.setInt(1, IDprenotazione);
-            ps.executeUpdate();
+            double prezzo;
+            double rimborso = 0;
+            int id_utente = 0;
+            
+            PreparedStatement psPrezzo = con.prepareStatement("SELECT * FROM prenotazione P JOIN prezzo R WHERE P.id_prezzo = Rid_prezzo"
+                    + "AND id_prenotazione = ?");
+            psPrezzo.setInt(1,IDprenotazione);
+            ResultSet rs = psPrezzo.executeQuery();
+            if(rs.next()){
+                prezzo = rs.getDouble("prezzo");
+                rimborso = (prezzo/100)*80;
+                id_utente = rs.getInt("id_utente");
+            }
+            
+            PreparedStatement psCancellazione = con.prepareStatement("DELETE * FROM prenotazione WHERE id_prenotazione = ?");
+            psCancellazione.setInt(1, IDprenotazione);
+            PreparedStatement psRimborso = con.prepareStatement("UPDATE utente SET credito = ? WHERE id_utente = ?");
+            psRimborso.setDouble(1, rimborso);
+            psRimborso.setInt(2, id_utente);
+            psCancellazione.executeUpdate();
+            psRimborso.executeUpdate();
             return true;
         }catch(SQLException ex){
+            System.out.println(ex.toString());
             return false;
         }
     }
@@ -841,7 +914,9 @@ public class DBManager implements Serializable {
         
         return p;
     }
-    
+    /**
+     *Imposta una prenotazione come pagata
+     */
     public boolean setPrenotazionePagata(int id_prenotazione)
     {
         try{
@@ -855,8 +930,6 @@ public class DBManager implements Serializable {
             return false;
         }
     }
-    
-    
 }
 
 

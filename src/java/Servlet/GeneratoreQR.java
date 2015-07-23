@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.glxn.qrgen.QRCode;
 import net.glxn.qrgen.image.ImageType;
-import Bean.Email;
+import Bean.ValidationEmail;
 
 
 /**
@@ -62,7 +62,7 @@ public class GeneratoreQR extends HttpServlet {
         
         //codice per testare anche l'invio di email. Andiamo, è più comodo nella stessa pagina, lo sapete tutti
         //il costruttore al momento non fa nulla, devo prima vedere se google ha ragione
-        Email testE = new Email();
+        ValidationEmail testE = new ValidationEmail();
         testE.Invia();
     }
 
