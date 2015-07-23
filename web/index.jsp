@@ -73,7 +73,23 @@
    
     <div class="slider-container">  <!-- dimensione   width: 100%;  height: 400px; -->
         <div class="slider">
-            <div class="slider-img" id="slider1">
+            <% 
+                films = f.getFilms();
+                for(int i= 0; i < films.size(); i++)
+                {
+                    out.println(""
+                            + "<div class=\"slider-img\" id=\"slider"+(i+1)+"\" style=\"background-image:url(\'css/gallery/Big/"+films.get(i).getTitolo().replaceAll("\\s+","")+".jpg\');\">"
+                            + "<div class=\"opacita\"></div>"
+                            + "<div class=\"slider-containerTxt\">"
+                            + "<p class=\"slider-txt\">"
+                            + films.get(i).getFrase()
+                            + "</p></div>"
+                            + "<a href=\"SchedaFilm/SchedaFilm.html?titolo="+films.get(i).getTitolo()+"\" class=\"slider-btn\">Informazioni</a>"
+                            + "</div>");
+                }
+            %>
+            
+            <!--<div class="slider-img" id="slider1">
                 <div class="opacita"></div>
                 <div class="slider-containerTxt">
                     <p class="slider-txt">"Dotato di tempi comici e trovate impeccabili,<br>
@@ -152,7 +168,7 @@
                         il secondo Ted perde per strada<br> la sua parte più seria..."</p>
                 </div>
                 <a href="#" class="slider-btn">Informazioni</a>
-            </div>
+            </div>-->
             <img src="js/Slider/leftArrow.png" class="slider-left"/>
             <img src="js/Slider/rightArrow.png" class="slider-right"/>
             <div class="containerIndex" unselectable="on">
@@ -219,7 +235,7 @@
                                 out.println("<div class=\"filmIndex filmCol1\">");
                             else   
                                 out.println("<div class=\"filmIndex filmCol2\">");
-                            out.println("<img class=\"locandinaIndex\" src=\"SchedaFilm/locandine/" + films.get(i).getTitolo() +".jpg\">");
+                            out.println("<img class=\"locandinaIndex\" src=\"img/locandine/" + films.get(i).getTitolo().replaceAll("\\s+","") +".jpg\">");
                             out.println("<div class=\"infoFilmIndex\">");
                             out.println("<h2>" + films.get(i).getTitolo() + "</h2>");
                             out.println("<table>");

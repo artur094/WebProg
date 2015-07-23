@@ -302,8 +302,10 @@ display:block;
 }
 
 .locandinaIndex{
-    height: 200px;
+    max-height: 200px;
     float: left;
+    background-size: contain;
+    width: 100px;
 }
 
 .infoFilmIndex{

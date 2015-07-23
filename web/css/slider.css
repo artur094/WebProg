@@ -24,12 +24,13 @@ body{
 
 .slider-img{
     position: relative;
-    background-color: skyblue;
+    //background-color: skyblue;
     min-width: 10%;
     height: 400px;
     display: table-cell;
     float: left;
     margin: 0px;
+    background-size: cover;
 }
 
 .slider-left{
@@ -53,7 +54,7 @@ body{
     //background-color: red;
     text-align: center;
 }
-
+/*
 #slider1{
     background-image: url(gallery/Big/0.jpg);
     background-size:cover;
@@ -93,7 +94,7 @@ body{
 #slider10{
     background-image: url(gallery/Big/3.jpg);
     background-size: cover;
-}
+}*/
 
 .containerIndex{
     min-width: 100%;
