@@ -237,6 +237,45 @@ public class DBManager implements Serializable {
         return listSpettacoli;
     }
     
+     public Film getFilm(String titolo) throws SQLException
+    {
+        Film f = null;
+       // PreparedStatement ps = con.prepareStatement(
+         //           "SELECT titolo, url_trailer,durata, trama, url_locandina,descrizione FROM film AS f, genere AS G WHERE f.id_genere = g.id_genere AND f.titolo = ?");
+        
+        PreparedStatement ps = con.prepareStatement("select Z.DESCRIZIONE,F.TITOLO,F.DURATA,F.TRAMA,F.FRASE,F.REGISTA,F.ATTORI,G.DESCRIZIONE AS GENERE from (SELECT T.DESCRIZIONE,S.ID_FILM FROM sala T, spettacolo S WHERE T.id_sala = S.id_sala) AS Z,film F, genere G WHERE F.ID_FILM = Z.ID_FILM AND F.ID_GENERE = G.ID_GENERE AND F.titolo = ?" );
+        
+        try{
+            ps.setString(1, titolo);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            try{
+                if(rs.next())
+                {
+                    f = new Film();
+                    f.setRegista(rs.getString("regista"));
+                    f.setAttori(rs.getString("attori"));
+                    f.setDurata(rs.getInt("durata"));
+                    f.setGenere(rs.getString("genere"));
+                    f.setTitolo(rs.getString("titolo"));
+                    f.setTrama(rs.getString("trama"));
+                    f.setNome_Sala(rs.getString("descrizione"));
+//                    f.setUrl_locandina(rs.getString("url_locandina"));
+//                    f.setUrl_trailer(rs.getString("url_trailer"));
+                }
+            }
+            finally{
+                rs.close();
+            }
+            
+        }finally
+        {
+            ps.close();
+        }
+        return f;
+    }
+    
     /**
      * Ritorna un film che possiede quell'id
      *@param id_film id del film che voglio ottenere
@@ -727,12 +766,14 @@ public class DBManager implements Serializable {
         }
     }
     
-    
+    /**
+    * Seleziona tutti i posti in quella sala
+    */
     public List<Posto> getPosti(String sala) throws SQLException
     {
         List<Posto> lista = new ArrayList<Posto>();
         
-        PreparedStatement ps = con.prepareStatement("SELECT id_posto, riga, colonna, esiste FROM posto as P, sala as S WHERE P.id_sala = S.id_sala AND S.descrizione = ?");
+        PreparedStatement ps = con.prepareStatement("SELECT id_posto, riga, colonna, esiste,occupato FROM posto as P, sala as S WHERE P.id_sala = S.id_sala AND S.descrizione = ?");
             
             try
             {
@@ -747,6 +788,7 @@ public class DBManager implements Serializable {
                         p.setEsiste(rs.getBoolean("esiste"));
                         p.setRiga(rs.getInt("riga"));
                         p.setColonna(rs.getInt("colonna"));
+                        p.setOccupato(rs.getBoolean("occupato"));
                         lista.add(p);
                     }
                 } finally {

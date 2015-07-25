@@ -60,7 +60,7 @@ public class AdminFilter implements Filter {
                     ((HttpServletRequest)request).getSession());
             
         }
-        else if(!user.getRuolo().equals("admin"))
+        else if(!user.getRuolo().equals("2"))
         {
             // Inoltro alla pagina di errore, dato che non può accedere perchè non ha i privilegi
             (new Security()).UnauthorizedAdminPage(

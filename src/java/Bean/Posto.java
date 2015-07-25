@@ -5,6 +5,11 @@
  */
 package Bean;
 
+import Database.DBManager;
+import Servlet.Controller;
+import java.sql.SQLException;
+import java.util.List;
+
 /**
  *
  * @author Utente
@@ -17,7 +22,13 @@ public class Posto {
     private int colonna;
     private boolean esiste;
     private boolean pagato;
+    private boolean occupato;
 
+    public static List<Posto> getPosti(String descrizioneSala) throws SQLException{
+        DBManager tmp = new DBManager(Controller.URL_DB);
+        return tmp.getPosti(descrizioneSala);
+    }
+    
     public Posto(int IDsala,int IDposto, int riga, int colonna, boolean esiste, boolean pagato) {
         this.IDsala = IDsala;
         this.IDposto = IDposto;
@@ -29,6 +40,14 @@ public class Posto {
     
     public Posto()
     {}
+
+    public boolean isOccupato() {
+        return occupato;
+    }
+
+    public void setOccupato(boolean occupato) {
+        this.occupato = occupato;
+    }
     
     public int getIDposto() {
         return IDposto;

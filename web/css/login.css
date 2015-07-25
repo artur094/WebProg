@@ -199,7 +199,7 @@ input:focus, textarea:focus {
     display: none;
     -webkit-filter:blur(1px);
     filter:blur(1px);
-    background-image: url(gallery/blur.png);
+    background-image: url(../img/blur.png);
     background-repeat: repeat;
     background-size: cover;
     opacity: 0.85;

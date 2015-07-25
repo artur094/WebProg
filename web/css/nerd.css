@@ -1,0 +1,97 @@
+body{
+    margin: 0px;
+}
+
+.heroes{
+    display: block;
+    background-color: steelblue;
+    padding-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    text-align: center;
+}
+
+.rigaPoltrona{
+    display: table-row;
+        margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    text-align: center;
+    width: 100%;
+    position: relative;
+}
+
+.poltrona{
+    position: relative;
+    height: 80px;
+    width: 80px;
+    display: table-cell;
+    padding: 5px;
+}
+
+.polt_bottom{
+    position: absolute;
+    top: 30px;
+    left: 10px;
+    height: 80px;
+    width: 60px;
+    background-image: url(img/bottom.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.polt{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 80px;
+    width: 80px;
+    background-image: url(img/poltrona.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    overflow: hidden;
+}
+
+.polt_upper{
+    position: absolute;
+    top: -1px;
+    left: 1px;
+    height: 40px;
+    width: 80px;
+    background-image: url(img/upper.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transform: scaleX(0.93);
+}
+
+.polt_img{
+    position: absolute;
+    top: 24px;
+    left: 0px;
+    height: 50px;
+    width: 80px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.taken{
+    -webkit-filter: hue-rotate(0deg) brightness(0.3); 
+    filter: hue-rotate(0deg) brightness(0.3);
+    
+}
+
+.locked{
+    -webkit-filter: hue-rotate(45deg) brightness(2.5); 
+    filter: hue-rotate(45deg) brightness(2.5);
+    
+}
+
+.prenotato{
+    -webkit-filter: hue-rotate(143deg) brightness(1.1); 
+    filter: hue-rotate(143deg) brightness(1.1);
+}

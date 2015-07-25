@@ -21,7 +21,7 @@ public class Utente {
         this.email = email;
         this.password = password;
         this.credito = credito;
-        this.ruolo = ""; //inserire codice di ruolo per l'utente normale
+        this.ruolo = "2"; //inserire codice di ruolo per l'utente normale
     }
 
     public Utente(int userID, String email, String password, double credito, String ruoloID) {

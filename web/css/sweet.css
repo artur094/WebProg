@@ -1,0 +1,80 @@
+body{
+    margin: 0px;
+}
+
+.sweet{
+    background-color: indianred;
+    padding-bottom: 5px;
+}
+
+.rigaLetti{
+    width: 100%;
+    display: inline-block;
+    margin: 5px;
+}
+
+.letto{
+    display: table-cell;
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.materasso{
+    width: 120px;
+    height: 150px;
+    position: absolute;
+    background-color: transparent;
+    background-image: url(img/Bed2.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    border-radius: 6px;
+    
+-webkit-box-shadow: 2px 2px 4px 0px rgba(50, 50, 50, 0.6);
+-moz-box-shadow:    2px 2px 4px 0px rgba(50, 50, 50, 0.6);
+box-shadow:         2px 2px 4px 0px rgba(50, 50, 50, 0.6);
+}
+
+.pillowL{
+    width: 63px;
+    height: 40px;
+    left: -2px;
+    top: 111px;
+    position: absolute;
+    background-image: url(img/PillowL.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.pillowR{
+    width: 62px;
+    height: 40px;
+    left: 58px;
+    top: 112px;
+    position: absolute;
+    background-image: url(img/PillowR.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+
+}
+
+
+.prenotato{
+   /* -webkit-filter: hue-rotate(251deg) brightness(1.3); 
+    filter: hue-rotate(251deg) brightness(1.3);*/
+    
+}
+
+.locked{
+    /*-webkit-filter: hue-rotate(181deg) brightness(1.3); 
+    filter: hue-rotate(181deg) brightness(1.3);*/
+    
+}
+
+.taken{
+    /*-webkit-filter: hue-rotate(143deg) brightness(1.1); 
+    filter: hue-rotate(143deg) brightness(1.1);*/
+}

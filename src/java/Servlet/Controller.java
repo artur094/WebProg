@@ -331,8 +331,14 @@ public class Controller extends HttpServlet {
         }
         else
         {
-            request.getSession().setAttribute("user", user);
-            forward_to(request, response, "/auth/accountPage.jsp");
+            if(user.getRuolo().equals("2")){
+                request.getSession().setAttribute("user", user);
+                forward_to(request, response, "/auth/accountPage.jsp");
+            }
+            else{
+                request.getSession().setAttribute("user", user);
+                forward_to(request, response, "/auth/accountPageAdmin.jsp");
+            }
         }
     }
     

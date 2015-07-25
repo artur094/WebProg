@@ -38,6 +38,16 @@ public class Film {
         return f;
     }
 
+    public static Film getFilmfromDB(String titolo) throws SQLException
+    {
+        Film f = null;
+        DBManager dbm = new DBManager(Controller.URL_DB);
+        f = dbm.getFilm(titolo);
+        
+        return f;
+    }
+
+    
     public String getRegista() {
         return regista;
     }

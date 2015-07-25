@@ -64,7 +64,7 @@
 <header>
     
         <div class="container-logo">
-            <div class="logo" style="PADDING-TOP: 20px"> <a href="index.html" class="a_logo"></a></div>
+            <div class="logo" style="PADDING-TOP: 20px"> <a href="index.jsp" class="a_logo"></a></div>
         </div>
         <div class="login">
             <div id="btnAccedi" class="btnAccedi">Accedi / Iscriviti</div>
@@ -78,13 +78,13 @@
                 for(int i= 0; i < films.size(); i++)
                 {
                     out.println(""
-                            + "<div class=\"slider-img\" id=\"slider"+(i+1)+"\" style=\"background-image:url(\'css/gallery/Big/"+films.get(i).getTitolo().replaceAll("\\s+","")+".jpg\');\">"
+                            + "<div class=\"slider-img\" id=\"slider"+(i+1)+"\" style=\"background-image:url(\'img/Slider/"+films.get(i).getTitolo().replaceAll("\\s+","")+".jpg\');\">"
                             + "<div class=\"opacita\"></div>"
                             + "<div class=\"slider-containerTxt\">"
                             + "<p class=\"slider-txt\">"
                             + films.get(i).getFrase()
                             + "</p></div>"
-                            + "<a href=\"SchedaFilm/SchedaFilm.html?titolo="+films.get(i).getTitolo()+"\" class=\"slider-btn\">Informazioni</a>"
+                            + "<a href=\"SchedaFilm.jsp?titolo="+films.get(i).getTitolo()+"\" class=\"slider-btn\">Informazioni</a>"
                             + "</div>");
                 }
             %>
@@ -169,8 +169,8 @@
                 </div>
                 <a href="#" class="slider-btn">Informazioni</a>
             </div>-->
-            <img src="js/Slider/leftArrow.png" class="slider-left"/>
-            <img src="js/Slider/rightArrow.png" class="slider-right"/>
+            <img src="img/Slider/leftArrow.png" class="slider-left"/>
+            <img src="img/Slider/rightArrow.png" class="slider-right"/>
             <div class="containerIndex" unselectable="on">
                 <div class="roundedIndex activeIndex"  unselectable="on">&nbsp;</div>
                 <div class="roundedIndex" unselectable="on">&nbsp;</div>
@@ -285,8 +285,8 @@
                             out.println("</table>");
                            
                             out.println("<div class=\"btnsFilm\">");
-                            out.println("<span><a href=\"SchedaFilm/SchedaFilm.html?titolo="+films.get(i).getTitolo()+"\" class=\"btnScheda\">Scheda Film</a></span>");
-                            out.println("<span><a href=\"Prenotazione/PrenotazioneBuff.html?sala="+films.get(i).getNome_Sala()+"&film="+films.get(i).getTitolo()+"\" class=\"btnPrenota\">Prenota</a></span>");
+                            out.println("<span><a href=\"SchedaFilm.jsp?titolo="+films.get(i).getTitolo()+"\" class=\"btnScheda\">Scheda Film</a></span>");
+                            out.println("<span><a href=\"prenotazione.jsp?sala="+films.get(i).getNome_Sala()+"&film="+films.get(i).getTitolo()+"\" class=\"btnPrenota\">Prenota</a></span>");
                             out.println("</div></div></div>");
                         }
                     %>
