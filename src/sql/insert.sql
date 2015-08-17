@@ -1,6 +1,7 @@
 --ruoli
 insert into ruolo (ruolo) values ('admin');
 insert into ruolo (ruolo) values ('user');
+insert into ruolo (ruolo) values ('da validare');
 
 --admin
 insert into utente (email, password, credito, id_ruolo) values ('admin@cineland.it', 'admin', 0, 1);

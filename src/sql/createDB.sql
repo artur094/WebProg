@@ -57,6 +57,8 @@ CREATE TABLE utente
     password varchar(50),
     credito double,
     id_ruolo int,
+    codice_attivazione double,
+    data_codice timestamp,
     constraint utente_pk primary key (id_utente),
     constraint utente_ruolo_fk foreign key (id_ruolo) references ruolo(id_ruolo)
 );

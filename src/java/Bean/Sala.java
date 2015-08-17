@@ -6,6 +6,7 @@
 package Bean;
 
 import Database.DBManager;
+import Servlet.Controller;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import java.util.List;
 */
 public class Sala {
     private int id_sala;
+    private String nome;
     private int id_spettacolo;
     private int max_righe;
     private int max_colonne;
@@ -35,11 +37,31 @@ public class Sala {
         this.id_spettacolo = id_spettacolo;
         try{
             refreshMappa();
+            Sala s = dbm.getSala(id_spettacolo);
+            id_sala = s.getId_sala();
+            nome = s.getNome();
+        }
+        catch(SQLException sqlex){
+            
+        }        
+    }
+    
+     public Sala(int id_spettacolo)
+    {
+        this.id_spettacolo = id_spettacolo;
+        try{
+            this.dbm = new DBManager(Controller.URL_DB);
+            Sala s = dbm.getSala(id_spettacolo);
+            id_sala = s.getId_sala();
+            nome = s.getNome();
+            refreshMappa();
         }
         catch(SQLException sqlex){
             
         }
     }
+     
+     public Sala(){}
     
     public void refreshMappa() throws SQLException
     {
@@ -134,4 +156,14 @@ public class Sala {
     public void setMax_colonne(int max_colonne) {
         this.max_colonne = max_colonne;
     }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+    
+    
 }

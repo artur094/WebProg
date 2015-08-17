@@ -10,6 +10,7 @@ import Bean.Utente;
 import Bean.Film;
 import Bean.Posto;
 import Bean.Prezzo;
+import Bean.Sala;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -163,23 +164,26 @@ public class DBManager implements Serializable {
         }
     }
     
-    public List<Film> getFilmSingoli() throws SQLException{
+    public List<Film> getFilmSingoliFromSpettacoli() throws SQLException{
+        
         List<Film> listFilm = new ArrayList<Film>();
         try{
-        PreparedStatement ps = con.prepareStatement("select Z.DESCRIZIONE,F.TITOLO,F.DURATA,F.TRAMA,F.FRASE,F.REGISTA,F.ATTORI,G.DESCRIZIONE AS GENERE \n" +
-"from (SELECT T.DESCRIZIONE,S.ID_FILM FROM sala T, spettacolo S WHERE T.id_sala = S.id_sala) AS Z,film F, genere G\n" +
-"WHERE F.ID_FILM = Z.ID_FILM AND F.ID_GENERE = G.ID_GENERE");
+        PreparedStatement ps = con.prepareStatement("select Z.ID_SPETTACOLO, F.ID_FILM, Z.DESCRIZIONE,F.TITOLO,F.DURATA,F.TRAMA,G.DESCRIZIONE AS GENERE from (SELECT T.DESCRIZIONE,S.ID_FILM, S.ID_SPETTACOLO FROM sala T, spettacolo S WHERE T.id_sala = S.id_sala AND S.data_ora >= ?) AS Z,film F, genere G WHERE F.ID_FILM = Z.ID_FILM AND F.ID_GENERE = G.ID_GENERE");
+        
+        Date dt = new Date();
+        dt.setMinutes(dt.getMinutes()+15);
+        ps.setTimestamp(1, new Timestamp(dt.getTime()));
+        
         ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 Film f = new Film();
+                f.setId_spettacolo(rs.getInt("id_spettacolo"));
+                f.setId_film(rs.getInt("id_film"));
                 f.setDurata(rs.getInt("durata"));
                 f.setTitolo(rs.getString("titolo"));
                 f.setGenere(rs.getString("genere"));
                 f.setTrama(rs.getString("trama"));
                 f.setNome_Sala(rs.getString("descrizione"));
-                f.setAttori((rs.getString("attori")));
-                f.setRegista(rs.getString("regista"));
-                f.setFrase(rs.getString("frase"));
                 listFilm.add(f);
             }
             
@@ -315,7 +319,40 @@ public class DBManager implements Serializable {
         return f;
     }
     
-
+    public Film getFilmFromSpettacolo(int id_spettacolo) throws SQLException
+    {
+        Film f = null;
+        PreparedStatement ps = con.prepareStatement(
+                    "SELECT S.id_film, titolo, url_trailer,durata, trama, url_locandina,descrizione FROM film AS f, genere AS G, spettacolo as S WHERE f.id_genere = g.id_genere AND f.id_film = S.id_film AND s.id_spettacolo = ?");
+        
+        try{
+            ps.setInt(1, id_spettacolo);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            try{
+                if(rs.next())
+                {
+                    f = new Film();
+                    f.setDurata(rs.getInt("durata"));
+                    f.setGenere(rs.getString("descrizione"));
+                    f.setId_film(rs.getInt("id_film"));
+                    f.setTitolo(rs.getString("titolo"));
+                    f.setTrama(rs.getString("trama"));
+                    f.setUrl_locandina(rs.getString("url_locandina"));
+                    f.setUrl_trailer(rs.getString("url_trailer"));
+                }
+            }
+            finally{
+                rs.close();
+            }
+            
+        }finally
+        {
+            ps.close();
+        }
+        return f;
+    }
     
     /**
      *Ritorna tutti i film contenuti nel DB
@@ -407,15 +444,17 @@ public class DBManager implements Serializable {
    
     public double CreaUtente(Utente u){
         try{
-            PreparedStatement ps = con.prepareStatement("INSERT INTO utente(email,password,credito,id_ruolo,verificato,codice_attivazione) VALUES (?,?,?,?,?,?)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO utente(email,password,credito,id_ruolo,codice_attivazione,data_codice) VALUES (?,?,?,?,?,?)");
             double codiceAttivazione = Math.round(Math.random()*5134);
-            
+            Date d = new Date();
+            d.setMinutes(d.getMinutes()+30);
             ps.setString(1,u.getEmail());
             ps.setString(2,u.getPassword());
             ps.setDouble(3,u.getCredito());
-            ps.setInt(4, 2); // 2 --> valore user (da recuperare dinamicamente)
-            ps.setBoolean(5, false);
-            ps.setDouble(6, codiceAttivazione);
+            ps.setInt(4, 3); // 3 --> valore 'da validare' (da recuperare dinamicamente)
+            ps.setDouble(5, codiceAttivazione);
+            ps.setTimestamp(6, new Timestamp(d.getTime()));
+            
             ps.executeUpdate();
          
             return codiceAttivazione;
@@ -454,9 +493,9 @@ public class DBManager implements Serializable {
             int codice = rs.getInt("codice_attivazione");
             int debug = 0;
                 if (codice == codiceAttivazione){
-                    PreparedStatement psAttivazione = con.prepareStatement("UPDATE utente SET verificato = ? WHERE email = ?");
-                    psAttivazione.setBoolean(1, true);
-                    psAttivazione.setString(2,u.getEmail());
+                    PreparedStatement psAttivazione = con.prepareStatement("UPDATE utente SET id_ruolo = 2 WHERE email = ? AND data_codice <= ?");
+                    psAttivazione.setString(1,u.getEmail());
+                    psAttivazione.setTimestamp(2, new Timestamp(new Date().getTime()));
                     int righeModificate = psAttivazione.executeUpdate();
                     if(righeModificate == 1)
                         return true;
@@ -468,6 +507,26 @@ public class DBManager implements Serializable {
             return false;
         }
     }
+    
+    public boolean CambiaCodice(Utente u,double codiceAttivazione){
+        try{
+            Date d = new Date();
+            d.setMinutes(d.getMinutes()+30);
+            PreparedStatement ps = con.prepareStatement("UPDATE utente SET (codice_attivazione, data_codice) = (?,?) WHERE id_utente = ?");
+            ps.setDouble(1, codiceAttivazione);
+            ps.setTimestamp(2, new Timestamp(d.getTime()));
+            ps.setInt(3, u.getUserID());
+            int righe = ps.executeUpdate();
+            if(righe == 1)
+                return true;
+            return false;
+        }catch(SQLException ex){
+            System.out.println(ex.toString());
+            return false;
+        }
+    }
+    
+    
     
     /**
      *Inserisce una prenotazione nel DB.
@@ -586,6 +645,23 @@ public class DBManager implements Serializable {
         return -1;
     }
     
+    public int getIDRuolo(String ruolo) throws SQLException
+    {
+        PreparedStatement ps = con.prepareStatement("SELECT id_ruolo FROM ruolo WHERE ruolo = ?");
+        ps.setString(1, ruolo);
+        ResultSet rs = ps.executeQuery();
+        try{
+            if(rs.next())
+            {
+                return rs.getInt("id_ruolo");
+            }
+        }finally{
+            rs.close();
+            ps.close();
+        }
+        return -1;
+    }
+    
     public int getIDPosto(int id_sala, int i, int j) throws SQLException
     {
         PreparedStatement ps = con.prepareStatement("SELECT id_posto FROM posto WHERE id_sala = ? AND riga = ? AND colonna =?");
@@ -607,6 +683,8 @@ public class DBManager implements Serializable {
         }
         return -1;
     }
+    
+    
     
     /**
      *Effettua il rimborso di una prenotazione, dato il suo ID. Calcola da sè l'80% del prezzo
@@ -731,6 +809,23 @@ public class DBManager implements Serializable {
             return rs.getInt("id_sala");
         }
         else return -1;
+ 
+    }
+    
+    public Sala getSala(int id_spettacolo) throws SQLException
+    {
+        PreparedStatement ps = con.prepareStatement("SELECT S.id_sala, S.descrizione FROM sala as S, spettacolo as P WHERE id_spettacolo = ? and P.id_sala = S.id_sala");
+        ps.setInt(1, id_spettacolo);
+        
+        ResultSet rs = ps.executeQuery();
+        if(rs.next())
+        {
+            Sala s = new Sala();
+            s.setId_sala(rs.getInt("id_sala"));
+            s.setNome(rs.getString("descrizione"));
+            return s;
+        }
+        else return null;
  
     }
     
@@ -894,6 +989,43 @@ public class DBManager implements Serializable {
                         u.setCredito(rs.getInt("credito"));
                         u.setRuolo(rs.getString("ruolo"));
                         u.setUserID(id_utente);
+                    }
+                } finally {
+                    // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 
+                    rs.close();
+                }
+            } finally{
+                ps.close();
+            }
+        }catch(SQLException sqlex)
+        {
+            return null;
+        }
+        
+        return u;
+    }
+    
+    public Utente getUtente(String email)
+    {
+        Utente u = null;
+        
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT email, credito, ruolo, id_utente FROM utente as u, ruolo as r WHERE email = ? AND r.id_ruolo = u.id_ruolo");
+            
+            try
+            {
+                ps.setString(1, email);
+                
+                ResultSet rs = ps.executeQuery();
+
+                try{
+                    if (rs.next()) {
+                        u = new Utente();
+                        
+                        u.setEmail(rs.getString("email"));
+                        u.setCredito(rs.getInt("credito"));
+                        u.setRuolo(rs.getString("ruolo"));
+                        u.setUserID(rs.getInt("id_utente"));
                     }
                 } finally {
                     // ricordarsi SEMPRE di chiudere i ResultSet in un blocco finally 

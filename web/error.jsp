@@ -14,6 +14,6 @@
     </head>
     <body>
         <h1>ERROR!</h1>
-        <%=exception.toString()%>
+        <p>Uh oh, si è verificato un errore :(</p>no
     </body>
 </html>

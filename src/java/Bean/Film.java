@@ -16,6 +16,7 @@ import java.sql.SQLException;
 public class Film {
 
     private Integer id_film;
+    private Integer id_spettacolo;
     private String titolo;
     private String genere;
     private String url_trailer;
@@ -37,6 +38,15 @@ public class Film {
         
         return f;
     }
+    
+    public static Film getFilmfromSpettacolo(int id_spettacolo) throws SQLException
+    {
+        Film f = null;
+        DBManager dbm = new DBManager(Controller.URL_DB);
+        f = dbm.getFilmFromSpettacolo(id_spettacolo);
+        
+        return f;
+    }
 
     public static Film getFilmfromDB(String titolo) throws SQLException
     {
@@ -47,6 +57,15 @@ public class Film {
         return f;
     }
 
+    public Integer getId_spettacolo() {
+        return id_spettacolo;
+    }
+
+    public void setId_spettacolo(Integer id_spettacolo) {
+        this.id_spettacolo = id_spettacolo;
+    }
+
+    
     
     public String getRegista() {
         return regista;

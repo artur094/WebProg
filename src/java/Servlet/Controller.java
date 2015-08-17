@@ -331,11 +331,11 @@ public class Controller extends HttpServlet {
         }
         else
         {
-            if(user.getRuolo().equals("2")){
+            if(user.getRuolo().equals("user") || user.getRuolo().equals("da verificare")){
                 request.getSession().setAttribute("user", user);
                 forward_to(request, response, "/auth/accountPage.jsp");
             }
-            else{
+            else if(user.getRuolo().equals("admin")){
                 request.getSession().setAttribute("user", user);
                 forward_to(request, response, "/auth/accountPageAdmin.jsp");
             }
@@ -348,7 +348,7 @@ public class Controller extends HttpServlet {
         u.setEmail(email);
         u.setCredito(0);
         u.setPassword(password);
-        u.setRuolo("user");
+        u.setRuolo("da validare");
         
         double codiceEsito = dbm.CreaUtente(u);
         //se la creazione è andata a buon fine
@@ -359,7 +359,7 @@ public class Controller extends HttpServlet {
             request.getSession().setAttribute("user", u);
             forward_to(request, response, "/auth/accountPage.jsp");
         }else{
-            forward_to(request, response, "/index(diverso).html");
+            forward_to(request, response, "/index.jsp");
         }
         
     }
@@ -367,14 +367,17 @@ public class Controller extends HttpServlet {
     private void valida(HttpServletRequest request, HttpServletResponse response) {
         String email = request.getParameter("email");
         double codice = Double.parseDouble(request.getParameter("codiceVal"));
-        if(request.getSession().getAttribute("user")!=null){
-            Utente u = (Utente)request.getSession().getAttribute("user");
-            if(u.getEmail().equals(email)){
-                dbm.AttivaUtente(u, codice);
-            }
-        }else{
+        Utente u = dbm.getUtente(email);
+        if(!u.getRuolo().equals("da verificare"))
             forward_to(request,response,"/error.jsp");
-        }
+        else if(dbm.AttivaUtente(u, codice))
+            forward_to(request,response,"/auth/accountPage.jsp");
+        else
+            forward_to(request,response,"/error.jsp");
+        //}
+        //}else{
+        //    forward_to(request,response,"/error.jsp");
+        //}
     }
     
     private void confermaPrivacy(HttpServletRequest request, HttpServletResponse response) {

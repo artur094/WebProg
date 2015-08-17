@@ -168,7 +168,7 @@ body{
 }
 
 .posto-top{
-    background-image: url(img/lifebelt.png);
+    background-image: url(../img/swimpool/lifebelt.png);
     background-size: contain;
     position: absolute;
     top: 1px;
@@ -196,7 +196,7 @@ body{
 
 
 .posto-bot{
-    background-image: url(img/lifebelt.png);
+    background-image: url(../img/swimpool/lifebelt.png);
     background-size: contain;
     position: absolute;
     height: 40px;
@@ -222,7 +222,7 @@ body{
 
 
 .posto-left{
-    background-image: url(img/lifebelt.png);
+    background-image: url(../img/swimpool/lifebelt.png);
     background-size: contain;
     height: 40px;
     width: 40px;
@@ -248,7 +248,7 @@ body{
 
 
 .posto-right{
-    background-image: url(img/lifebelt.png);
+    background-image: url(../img/swimpool/lifebelt.png);
     background-size: contain;
     height: 40px;
     width: 40px;

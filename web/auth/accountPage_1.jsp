@@ -51,7 +51,6 @@
         <p> containerInfoDeals</p>
         <p> containerInfoDeals</p>
     </span> 
-        <h2><a href="auth/rimborso.jsp">Effettua Rimborso</a></h2>
 </div>
 <div class="accountPageAdmin">
     

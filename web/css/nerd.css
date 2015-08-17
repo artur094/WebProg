@@ -36,7 +36,7 @@ body{
     left: 10px;
     height: 80px;
     width: 60px;
-    background-image: url(img/bottom.png);
+    background-image: url(../img/nerd/bottom.png);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -48,7 +48,7 @@ body{
     left: 0px;
     height: 80px;
     width: 80px;
-    background-image: url(img/poltrona.png);
+    background-image: url(../img/nerd/poltrona.png);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -61,7 +61,7 @@ body{
     left: 1px;
     height: 40px;
     width: 80px;
-    background-image: url(img/upper.png);
+    background-image: url(../img/nerd/upper.png);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;

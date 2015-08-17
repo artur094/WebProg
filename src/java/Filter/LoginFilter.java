@@ -102,6 +102,7 @@ public class LoginFilter implements Filter {
         
         doBeforeProcessing(request, response);
         
+        /*
         //controlla che i campi siano corretti
         String email = request.getParameter("email");
         String password = request.getParameter("password");
@@ -111,7 +112,9 @@ public class LoginFilter implements Filter {
         if(!m.matches()){
             //se l'email non contiene @
             return;
-        }
+        }*/
+        
+        
         
         Throwable problem = null;
         try {

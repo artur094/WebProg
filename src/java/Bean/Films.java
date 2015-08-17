@@ -30,7 +30,7 @@ public class Films {
     
     public List<Film> getFilms() throws SQLException
     {
-        lista = dbm.getFilmSingoli();
+        lista = dbm.getFilmSingoliFromSpettacoli();
         return lista;
     }
 }

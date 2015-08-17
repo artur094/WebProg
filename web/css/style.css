@@ -43,7 +43,7 @@ display: table-cell;
     background-repeat: no-repeat;
 }
 
-#btnAccedi{   //<!-- background in stylegradienti -->
+#btnAccedi, #btnDisconnetti{   //<!-- background in stylegradienti -->
     display: table-cell;
     width: 140px;
     //height: 30px;
@@ -70,7 +70,7 @@ display: table-cell;
     text-decoration: none;
 }
 
-#btnAccedi:hover{
+#btnAccedi:hover, #btnDisconnetti:hover{
     color: #ffffff;
     background: #d44b1a;
     background-image: -webkit-linear-gradient(top, #d44b1a, #fc7f12);

@@ -28,15 +28,15 @@
         </div>
     </header>
         <% 
-            String titolo = request.getParameter("titolo");
-            Film filmAttuale = Film.getFilmfromDB(titolo);
+            int id_film = Integer.parseInt(request.getParameter("id"));
+            Film filmAttuale = Film.getFilmfromDB(id_film);
         %>
         <div class="container">
             <div class="locandina">
                 <div class="container-locandina">
-                    <%out.println("<img class=\"cover\" src=\"img/locandine/" + titolo.replaceAll("\\s+","") + ".jpg\" alt=\""+ titolo +"\"/>");%>
+                    <%out.println("<img class='cover' src='img/locandine/" + filmAttuale.getTitolo().replaceAll("\\s+","") + ".jpg' alt='"+ filmAttuale.getTitolo() +"'/>");%>
                     <div class="info">1
-                        <p class="title"><%=titolo%></p><br>
+                        <p class="title"><%= filmAttuale.getTitolo() %></p><br>
                         <table>
                             <tr>
                                 <td class="generic">Genere</td>

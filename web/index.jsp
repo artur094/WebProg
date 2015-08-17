@@ -4,6 +4,8 @@
     Author     : Utente
 --%>
 
+<%@page import="Bean.Spettacoli"%>
+<%@page import="Bean.Utente"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="Bean.Film"%>
@@ -46,14 +48,18 @@
     Cookie[] cookies ;
     Films f = new Films();        
     List<Film> films;
+    
 %>
 <%
    cookies = request.getCookies();
-    for(int i = 0; i < cookies.length; i++){
-        if((cookies[i].getName()).compareTo("privacy") == 0){
-            privacy = true;
+   if(cookies != null)
+   {
+        for(int i = 0; i < cookies.length; i++){
+            if((cookies[i].getName()).compareTo("privacy") == 0){
+                privacy = true;
+            }
         }
-    }
+   }
     
     if(!privacy){
             out.println("<div class=\"privacy\">"
@@ -67,7 +73,14 @@
             <div class="logo" style="PADDING-TOP: 20px"> <a href="index.jsp" class="a_logo"></a></div>
         </div>
         <div class="login">
-            <div id="btnAccedi" class="btnAccedi">Accedi / Iscriviti</div>
+            <%
+                Utente u = (Utente) request.getSession().getAttribute("user");
+                if(u == null)
+                    out.println("<div id='btnAccedi' class='btnAccedi'>Accedi / Iscriviti</div>");
+                else
+                    out.println("<div id='btnAccedi' class='btnAccedi'>Disconnetti</div>");
+            %>
+            
         </div>
     </header>
    
@@ -285,8 +298,8 @@
                             out.println("</table>");
                            
                             out.println("<div class=\"btnsFilm\">");
-                            out.println("<span><a href=\"SchedaFilm.jsp?titolo="+films.get(i).getTitolo()+"\" class=\"btnScheda\">Scheda Film</a></span>");
-                            out.println("<span><a href=\"prenotazione.jsp?sala="+films.get(i).getNome_Sala()+"&film="+films.get(i).getTitolo()+"\" class=\"btnPrenota\">Prenota</a></span>");
+                            out.println("<span><a href=\"SchedaFilm.jsp?id="+films.get(i).getId_film()+"\" class=\"btnScheda\">Scheda Film</a></span>");
+                            out.println("<span><a href=\"prenotazione.jsp?id="+films.get(i).getId_spettacolo()+"\" class=\"btnPrenota\">Prenota</a></span>");
                             out.println("</div></div></div>");
                         }
                     %>
@@ -501,38 +514,40 @@
       <div class="tab-content">
         <div id="signup">   
           <h1>  Benvenuto</h1> 
-          <form action="/" method="post">
+          <form action="/CineLand/Controller" method="post">
+              <input type="hidden" name="op" value="registrazione" />
           <div class="top-row">
             <div class="field-wrap">
               <label> Nome<span class="req">*</span></label>
-              <input type="text" required autocomplete="off" />
+              <input type="text" name="nome" required autocomplete="off" />
             </div>
             <div class="field-wrap">
               <label>Cognome<span class="req">*</span></label>
-              <input type="text"required autocomplete="off"/>
+              <input type="text" name="cognome" required autocomplete="off"/>
             </div>
           </div>
           <div class="field-wrap">
             <label>Indirizzo eMail <span class="req">*</span></label>
-            <input type="email"required autocomplete="off"/>
+            <input type="email" name="email" required autocomplete="off"/>
           </div>
           <div class="field-wrap">
             <label> Password<span class="req">*</span></label>
-            <input type="password"required autocomplete="off"/>
+            <input type="password" name="password" required autocomplete="off"/>
           </div>
           <button type="submit" class="button button-block"/>Registrati</button>
           </form>
         </div>
         <div id="login">   
           <h1>Bentornato!</h1>
-          <form action="/" method="post">
+          <form action="/CineLand/Controller" method="post">
+              <input type="hidden" name="op" value="login" />
             <div class="field-wrap">
                 <label> Indirizzo eMail<span class="req">*</span>   </label>
-                <input type="email"required autocomplete="off"/>
+                <input type="email" name="email" required autocomplete="off"/>
             </div>
           <div class="field-wrap">
             <label> Password<span class="req">*</span> </label>
-            <input type="password"required autocomplete="off"/>
+            <input type="password" name="password" required autocomplete="off"/>
           </div>    
           <p class="forgot"><a href="#">Hai dimenticato la password?</a></p>    
           <button class="button button-block"/>Log In</button>

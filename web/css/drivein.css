@@ -60,7 +60,7 @@ body{
     height: 600px;
     margin: 0px;
     background-color:darkgrey;
-    background-image: url(img/asfalto.jpg);
+    background-image: url(../img/drivein/asfalto.jpg);
     background-size: cover;
     background-repeat:repeat-y;
     overflow-y:hidden;
@@ -126,7 +126,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cc000000', e
 .car{
     width: 60px;
     height: 100px;
-    background-image: url(img/car3.PNG);
+    background-image: url(../img/drivein/car3.PNG);
     background-repeat: no-repeat;
     background-size: cover;
     display: inline-block;
@@ -146,7 +146,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cc000000', e
     left: 37px;
     width: 17px;
     height: 20px;
-    background-image: url(img/sedileR.PNG);
+    background-image: url(../img/drivein/sedileR.PNG);
     background-repeat: no-repeat;
     background-size: contain;
 }
@@ -158,7 +158,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cc000000', e
     left: 15px;
     width: 17px;
     height: 20px;
-    background-image: url(img/sedileL.PNG);
+    background-image: url(../img/drivein/sedileL.PNG);
     background-repeat: no-repeat;
     background-size: contain;
 }

@@ -4,11 +4,18 @@
     Author     : Utente
 --%>
 
+<%@page import="Bean.Film"%>
 <%@page import="Bean.Sala"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.List"%>
 <%@page import="Bean.Posto"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<%
+    int id_spettacolo = Integer.parseInt(request.getParameter("id"));
+    Sala sala = new Sala(id_spettacolo);
+    Film f = Film.getFilmfromSpettacolo(id_spettacolo);
+%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -32,19 +39,18 @@
   });
   </script>
     <%
-        String d = request.getParameter("sala");
-        switch(d){
-            case "DriveIn": out.println("<link href=\"css/drivein.css\" type=\"text/css\" rel=\"stylesheet\""); 
-                out.println("<script src=\"js/drivein.js\""); 
+        switch(sala.getNome()){
+            case "Sala Parcheggio": out.println("<link href='css/drivein.css' type='text/css' rel='stylesheet'>"); 
+                out.println("<script src='js/drivein.js'></script>"); 
                 break;
-            case "Sweet": out.println("<link href=\"css/sweet.css\" type=\"text/css\" rel=\"stylesheet\""); 
-                out.println("<script src=\"js/sweet.js\"");
+            case "Sala Cuori": out.println("<link href=\"css/sweet.css\" type=\"text/css\" rel=\"stylesheet\">"); 
+                out.println("<script src=\"js/sweet.js\"></script>");
                 break;
-            case "Piscina": out.println("<link href=\"css/swimpool.css\" type=\"text/css\" rel=\"stylesheet\"");
-                out.println("<script src=\"js/swimpool.js\"");
+            case "Sala Piscina": out.println("<link href=\"css/swimpool.css\" type=\"text/css\" rel=\"stylesheet\">");
+                out.println("<script src=\"js/swimpool.js\"></script>");
                 break;
-            case "Nerd": out.println("<link href=\"css/nerd.css\" type=\"text/css\" rel=\"stylesheet\""); 
-                out.println("<script src=\"js/nerd.js\"");
+            case "Sala Nerd": out.println("<link href=\"css/nerd.css\" type=\"text/css\" rel=\"stylesheet\">"); 
+                out.println("<script src=\"js/nerd.js\"></script>");
                 break;
         }
                 
@@ -63,9 +69,135 @@
         
         <div class="frameSala">
                 <%                    
-                    List<Posto> p =  Posto.getPosti(d);
-                    String[][] mappa;
+                    String[][] mappa = sala.getMappa();
                     
+                    if(sala.getNome().equals("Sala Parcheggio"))
+                    {
+                        out.println("<div class='container-drivein' id='c-drivein'>");
+                        out.println("<div class='drivein'>");
+                        out.println("<div class='drivein-opacita'>&nbsp</div>");
+                        for(int i=0; i<sala.getMax_righe();i++)
+                        {
+                            out.println("<div class='car-lane' id='car-lane"+(1+i)+"'>");
+                            for(int j=0; j<sala.getMax_colonne();j++)
+                            {
+                                out.println("<div class='car' id='car"+(1+j)+"'>");
+                                out.println("<span class='sedileL'></span>");
+                                out.println("<span class='sedileR'></span>");
+                                out.println("</div>");
+                            }
+                            out.println("</div>");
+                        }
+                        out.println("</div>");
+                        out.println("</div>");
+                    }
+                    else if(sala.getNome().equals("Sala Cuori"))
+                    {
+                        out.println("<div class='sweet'>");
+                        for(int i=0; i<sala.getMax_righe();i++)
+                            {
+                                out.println("<div class='rigaLetti'>");
+                                for(int j=0; j<sala.getMax_colonne();j++)
+                                {
+                                    out.println("<div class='letto'>");
+                                    out.println("<div class='materasso'></div>");
+                                    out.println("<div class='pillowL'></div>");
+                                    out.println("<div class='pillowR'></div>");
+                                    out.println("</div>");
+                                }
+                                out.println("</div>");
+                            }
+                        out.println("</div>");
+                    }
+                    else if(sala.getNome().equals("Sala Piscina"))
+                    {
+                        out.println("<div class='container-pool'>");
+                        out.println("<div class='swimPool'>");
+                        out.println("<div class='swimPool-opacita'>&nbsp</div>");
+                        for(int i=0; i<sala.getMax_righe();i++)
+                        {
+                            out.println("<div class='row-pool'>");
+                            for(int j=0; j<sala.getMax_colonne();j++)
+                            {
+                                out.println("<div class='pool'>");
+                                out.println("<div class='water'></div>");
+                                out.println("<div class='pool-l1'></div>");
+                                out.println("<div class='pool-l2'></div>");
+                                out.println("<div class='pool-l3'></div>");
+                                out.println("<div class='pool-l4'></div>");
+                                out.println("<div class='belt posto-top'>&nbsp</div>");
+                                out.println("<div class='belt posto-bot'>&nbsp</div>");
+                                out.println("<div class='belt posto-left'>&nbsp</div>");
+                                out.println("<div class='belt posto-right'>&nbsp</div>");
+                                out.println("</div>");
+                            }
+                            out.println("</div>");
+                        }
+                        out.println("</div>");
+                        out.println("</div>");
+                    }
+                    else if(sala.getNome().equals("Sala Nerd"))
+                    {
+                        out.println("<div class='heroes'>");
+                        for(int i=0; i<sala.getMax_righe();i++)
+                        {
+                            out.println("<div class='rigaPoltrona'>");
+                            for(int j=0; j<sala.getMax_colonne();j++)
+                            {
+                                String url_img = "img/nerd/";
+                                switch(j)
+                                {
+                                    case 0:
+                                        url_img+="1437399069_Loki.png";
+                                        break;
+                                    case 1:
+                                        url_img+="1437399067_Black_Widow.png";
+                                        break;
+                                    case 2:
+                                        url_img+="1437399065_Thor.png";
+                                        break;
+                                    case 3:
+                                        url_img+="1437399063_Hawkeye.png";
+                                        break;
+                                    case 4:
+                                        url_img+="1437399062_Captain_America.png";
+                                        break;
+                                    case 5:
+                                        url_img+="1437399056_Iron_Man.png";
+                                        break;
+                                    case 6:
+                                        url_img+="1437399059_Hulk.png";
+                                        break;
+                                    case 7:
+                                        url_img+="dragonball2_128.png";
+                                        break;
+                                    case 8:
+                                        url_img+="dragonball3_128.png";
+                                        break;
+                                    case 9:
+                                        url_img+="bender_128.png";
+                                        break;
+                                    default:
+                                        url_img+="darthvader.png";
+                                        break;
+                                                                    
+                                }
+                                
+                                out.println("<span class='poltrona'>");
+                                out.println("<div class='polt_bottom'></div>");
+                                out.println("<div class='polt'>&nbsp</div>");
+                                out.println("<div class='polt_img' style='background-image: url("+url_img+");'></div>");
+                                out.println("<div class='polt_upper'></div>");
+                                out.println("</span>");
+                            }
+                            out.println("</div>");
+                        }
+                        out.println("</div>");
+                    }
+                    
+                    
+                    
+                    /*
                     if(d.equals("DriveIn")){
                         out.println("<div class=\"container-drivein\" id=\"c-drivein\">");
                         out.println("<div class=\"drivein\">");
@@ -148,7 +280,7 @@
                         }
                         out.println("</div>");
                         out.println("</div>");
-                    }
+                    
 //  
 //                    for(int i = 0; i < p.size(); i++){
 //                        out.println("<tr>");
@@ -159,14 +291,14 @@
 //                                out.println("<td>X</td>");
 //                        }
 //                        out.println("</tr>");
-//                    }
+//                    }*/
                 %>
         </div>
         <div class="content-info">
             
                 <%
-                      String film = request.getParameter("film");
-                      out.println("<div class=\"locandina\" style=\"background-image:url(img/locandine/" + film.replaceAll("\\s+","") + ".jpg); +"\">");
+                      String film = f.getTitolo();
+                      out.println("<div class='locandina' style='background-image:url(img/locandine/" + film.replaceAll("\\s+","") + ".jpg);" +"'>");
                 %>
             </div>
             <div class="destraLocandina">
@@ -300,8 +432,8 @@
     <script>
         $(document).ready(function(){
             
-            var sala = getUrlParameter('sala');
-            var film = getUrlParameter('film');
+            var sala = "<%= sala.getNome() %>";
+            var film = "<%= f.getTitolo() %>";
             var frame = $('#frameSala');
            // alert(sala);
             var path = "../"+sala+"/"+sala+".html #c-"+sala;
@@ -328,7 +460,7 @@
                 }
             }
             
-            var time = setInterval(timer, 1000);
+            var time = setInterval(timer, 100000);
             
             function timer()
             {
@@ -352,7 +484,7 @@
                     {
                         alert('Tempo scaduto prenotazione annullata');
                         window.clearInterval(time);
-                        window.location.replace("../index.jsp");
+                        window.location.replace("index.jsp");
                     }
                 }
                 $('.time').text(min+":"+sec);

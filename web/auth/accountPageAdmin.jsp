@@ -35,11 +35,10 @@
         Utente u = (Utente)session.getAttribute("user");
     %>
     <h1 class="welcomeName">Benvenuto Admin <%= u.getEmail() %> </h1>
-        <h2>Inserisci spettacolo</h2>
-            <a href="auth/admin/add_spettacolo.jsp"/>
-        <h2>Effettua Rimborso</h2>
-            <a href="auth/admin/rimborso.jsp"/> 
-        </form>
+    <h2><a href="auth/admin/add_spettacolo.jsp">Inserisci spettacolo</a></h2>
+            
+    <h2><a href="auth/rimborso.jsp">Effettua Rimborso</a></h2>
+             
 </div>
 <footer>
     <div> &#169; 2015 CINELAND - Indirizzo . Trento (TN) - tel. 0464852145 - P.Iva 14256748790 </div> 
