@@ -16,6 +16,8 @@ import Bean.Spettacolo;
 import Bean.Utente;
 import Database.DBManager;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -105,10 +107,44 @@ public class Controller extends HttpServlet {
             case "confermaPrivacy":
                 confermaPrivacy(request,response);
                 break;
+            case "reset":
+                if(email == null)
+                    break;
+                reset_psw(email, request, response);
+                break;
             default:
                 forward_to(request, response, "/error.jsp");
                 break;
         }
+        
+    }
+    
+    protected void reset_psw(String email, HttpServletRequest request, HttpServletResponse response)
+    {
+        try{
+            String hash = dbm.password_dimenticata(email);
+            
+            if(hash == null)
+            {
+                forward_to(request, response, "/error.jsp");
+            }
+            
+            String testo="";
+            testo+="Ciao! Hai richiesto il reset della password. Nel caso non sia stato tu, non serve che vai sul link sottostante.\n";
+            testo+="Vai sul link per resettare la password:\n";
+            testo+=request.getServerName()+"Controller?op=psw&code="+hash;
+            ValidationEmail ve = new ValidationEmail(email, testo);
+            ve.InviaReset();
+        }
+        catch(NoSuchAlgorithmException nsae)
+        {
+            forward_to(request, response, "/error.jsp");
+        }
+        catch(UnsupportedEncodingException uee)
+        {
+            forward_to(request, response, "/error.jsp");
+        }
+        
         
     }
     

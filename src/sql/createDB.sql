@@ -7,6 +7,7 @@ DROP TABLE ruolo;
 DROP TABLE sala;
 DROP TABLE genere;
 DROP TABLE prezzo;
+DROP TABLE password_dimenticata;
 
 CREATE TABLE sala
 (
@@ -61,6 +62,13 @@ CREATE TABLE utente
     data_codice timestamp,
     constraint utente_pk primary key (id_utente),
     constraint utente_ruolo_fk foreign key (id_ruolo) references ruolo(id_ruolo)
+);
+
+CREATE TABLE password_dimenticata
+(
+    email varchar(50),
+    codice varchar(300), 
+    data timestamp
 );
 
 CREATE TABLE posto

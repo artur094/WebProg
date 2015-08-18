@@ -268,22 +268,6 @@
                             out.println(films.get(i).getGenere());
                             out.println("</td>");
                             out.println("</tr>");
-                            out.println("<tr>");
-                            out.println("<td>");
-                            out.println("<b>Regista</b>");
-                            out.println("</td>");
-                             out.println("<td>");
-                            out.println(films.get(i).getRegista());
-                            out.println("</td>");
-                            out.println("</tr>");
-                            out.println("<tr>");
-                            out.println("<td>");
-                            out.println("<b>Attori</b>");
-                            out.println("</td>");
-                             out.println("<td>");
-                            out.println(films.get(i).getAttori());
-                            out.println("</td>");
-                            out.println("</tr>");
                             
                             out.println("<tr>");
                             out.println("<td>");
@@ -295,6 +279,22 @@
                             out.println("</tr>");
                             out.println("<tr>");
                             out.println("<td>");
+                            out.println("<tr>");
+                            out.println("<td>");
+                            out.println("<b>Locandina</b>");
+                            out.println("</td>");
+                             out.println("<td>");
+                            out.println("<a href='"+films.get(i).getUrl_locandina()+"'>"+films.get(i).getUrl_locandina()+"</a>");
+                            out.println("</td>");
+                            out.println("</tr>");
+                            out.println("<tr>");
+                            out.println("<td>");
+                            out.println("<b>Attori</b>");
+                            out.println("</td>");
+                             out.println("<td>");
+                            out.println("<a href='"+films.get(i).getUrl_trailer()+"'>"+films.get(i).getUrl_trailer()+"</a>");
+                            out.println("</td>");
+                            out.println("</tr>");
                             out.println("</table>");
                            
                             out.println("<div class=\"btnsFilm\">");
@@ -549,7 +549,7 @@
             <label> Password<span class="req">*</span> </label>
             <input type="password" name="password" required autocomplete="off"/>
           </div>    
-          <p class="forgot"><a href="#">Hai dimenticato la password?</a></p>    
+          <p class="forgot"><a href="Controller?op=reset&email=navi94@hotmail.it">Hai dimenticato la password?</a></p>    
           <button class="button button-block"/>Log In</button>
          </form>
         </div>

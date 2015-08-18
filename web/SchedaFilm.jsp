@@ -43,20 +43,20 @@
                                 <td><%= filmAttuale.getGenere()%></td>
                             </tr>
                             <tr>
-                                <td class="generic">Regista</td>
-                                <td><%= filmAttuale.getRegista()%></td>
-                            </tr>
-                            <tr>
-                                <td class="generic">Attori</td>
-                                <td><%= filmAttuale.getAttori()%></td>
-                            </tr>
-                            <tr>
                                 <td class="generic">Durata</td>
                                 <td><%= filmAttuale.getDurata()%></td>
                             </tr>
                             <tr>
                                 <td class="generic">Uscita</td>
                                 <td>25 giugno 2015</td>
+                            </tr>
+                            <tr>
+                                <td class="generic">Locandina</td>
+                                <td><a href="<%= filmAttuale.getUrl_locandina() %>"><%= filmAttuale.getUrl_locandina() %></a></td>
+                            </tr>
+                            <tr>
+                                <td class="generic">Trailer</td>
+                                <td><a href="<%= filmAttuale.getUrl_trailer() %>"><%= filmAttuale.getUrl_trailer() %></a></td>
                             </tr>
                             <tr>
                                 <td colspan="2">

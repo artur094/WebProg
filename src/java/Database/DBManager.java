@@ -12,6 +12,9 @@ import Bean.Posto;
 import Bean.Prezzo;
 import Bean.Sala;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -164,11 +167,41 @@ public class DBManager implements Serializable {
         }
     }
     
+    public String password_dimenticata(String email) throws NoSuchAlgorithmException, UnsupportedEncodingException
+    {
+        Timestamp ts = new Timestamp(new Date().getTime());
+        String testo = email+":"+ts.getTime();
+        
+        MessageDigest cript = MessageDigest.getInstance("SHA-1");
+        cript.reset();
+        cript.update(testo.getBytes("utf8"));
+        testo = new String(cript.digest().toString());
+        
+        try
+        {
+            PreparedStatement ps = con.prepareStatement("delete  from password_dimenticata where email = ?");
+            ps.setString(1, email);
+            ps.executeUpdate();
+
+            ps = con.prepareStatement("INSERT INTO password_dimenticata (email, codice, data) VALUES (?,?,?)");
+            ps.setString(1, email);
+            ps.setString(2, testo);
+            ps.setTimestamp(3, ts);
+            ps.executeUpdate();
+            
+            return testo;
+        }
+        catch(SQLException sqlex)
+        {
+            return null;
+        }
+    }
+    
     public List<Film> getFilmSingoliFromSpettacoli() throws SQLException{
         
         List<Film> listFilm = new ArrayList<Film>();
         try{
-        PreparedStatement ps = con.prepareStatement("select Z.ID_SPETTACOLO, F.ID_FILM, Z.DESCRIZIONE,F.TITOLO,F.DURATA,F.TRAMA,G.DESCRIZIONE AS GENERE from (SELECT T.DESCRIZIONE,S.ID_FILM, S.ID_SPETTACOLO FROM sala T, spettacolo S WHERE T.id_sala = S.id_sala AND S.data_ora >= ?) AS Z,film F, genere G WHERE F.ID_FILM = Z.ID_FILM AND F.ID_GENERE = G.ID_GENERE");
+        PreparedStatement ps = con.prepareStatement("select Z.ID_SPETTACOLO,F.URL_TRAILER, F.URL_LOCANDINA, F.ID_FILM, Z.DESCRIZIONE,F.TITOLO,F.DURATA,F.TRAMA,G.DESCRIZIONE AS GENERE from (SELECT T.DESCRIZIONE,S.ID_FILM, S.ID_SPETTACOLO FROM sala T, spettacolo S WHERE T.id_sala = S.id_sala AND S.data_ora >= ?) AS Z,film F, genere G WHERE F.ID_FILM = Z.ID_FILM AND F.ID_GENERE = G.ID_GENERE");
         
         Date dt = new Date();
         dt.setMinutes(dt.getMinutes()+15);
@@ -184,6 +217,8 @@ public class DBManager implements Serializable {
                 f.setGenere(rs.getString("genere"));
                 f.setTrama(rs.getString("trama"));
                 f.setNome_Sala(rs.getString("descrizione"));
+                f.setUrl_locandina(rs.getString("url_locandina"));
+                f.setUrl_trailer(rs.getString("url_trailer"));
                 listFilm.add(f);
             }
             

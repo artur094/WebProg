@@ -82,6 +82,38 @@ public class ValidationEmail {
             e.printStackTrace(); // USARE LOG4J!!!
         }
     }
+    
+    public void InviaReset(){
+        try { 
+            Properties props = System.getProperties();
+            
+            props.setProperty("mail.tranport.protocol", "smtp");
+            props.setProperty("mail.smtp.host", "smtp.gmail.com");
+            props.setProperty("mail.smtp.port", "587");
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("isSSL","true");
+            //props.put("mail.smtp.startssl.enable", "true");
+            props.put( "mail.debug", "true" );
+          
+            
+            Authenticator auth = new SMTPAuthenticator();
+            Session session = Session.getDefaultInstance(props,auth);
+            String msgBody = testo;
+            
+            Message msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress("progettoWeb94@gmail.com"));
+            msg.addRecipient(Message.RecipientType.TO,new InternetAddress(indirizzoDestinatario));
+            msg.setSubject("Email di Reset Password; no reply");
+            msg.setText(msgBody);
+           
+            Transport.send(msg);
+            
+        } catch (MessagingException e) {
+            System.out.println(e.toString());
+            e.printStackTrace(); // USARE LOG4J!!!
+        }
+    }
 
     private class SMTPAuthenticator extends javax.mail.Authenticator {
         public PasswordAuthentication getPasswordAuthentication() {
