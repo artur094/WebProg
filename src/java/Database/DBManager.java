@@ -11,6 +11,7 @@ import Bean.Film;
 import Bean.Posto;
 import Bean.Prezzo;
 import Bean.Sala;
+import Servlet.Controller;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -38,6 +39,16 @@ public class DBManager implements Serializable {
      * Costruttore; inizializza una connessione al DB
      *@param dburl URL del database a cui connettersi; l'username e la password devono essere root e root
      */
+    protected static DBManager dbm = null;
+    public static DBManager getDBM() throws SQLException
+    {
+        if(dbm == null)
+        {
+            dbm = new DBManager(Controller.URL_DB);
+        }
+        return dbm;
+    }
+    
     public DBManager(String dburl) throws SQLException{
         try{
             Class.forName("org.apache.derby.jdbc.ClientDriver", true, getClass().getClassLoader());
@@ -166,6 +177,122 @@ public class DBManager implements Serializable {
             return null;
         }
     }
+    public String CheckResetCode(String code)
+    {
+        String email = "";
+        try{
+            Date d = new Date();
+            d.setMinutes(d.getMinutes()-30);
+            PreparedStatement ps = con.prepareStatement("SELECT email FROM password_dimenticata WHERE codice = ? AND data >= ?");
+            ps.setString(1, code);
+            ps.setTimestamp(2, new Timestamp(d.getTime()));
+            ResultSet rs = ps.executeQuery();
+            
+            while(rs.next())
+            {
+                email = rs.getString("email");
+            }
+            
+            if(email.equals(""))
+                return null;
+            
+            ps = con.prepareStatement("DELETE FROM password_dimenticata WHERE email = ?");
+            ps.setString(1, email);
+            ps.executeUpdate();
+            
+        }catch(SQLException ex)
+        {
+            return null;
+        }
+        return email;
+    }
+    
+    public double incassi_per_film(int id_film)
+    {
+        double incassi = 0;
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT S.id_spettacolo FROM Spettacolo as S WHERE S.id_film = ?");
+            ps.setInt(1, id_film);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next())
+            {
+                incassi += incassi_spettacolo(rs.getInt("id_spettacolo"));
+            }
+            return incassi;
+        }
+        catch(SQLException sqlex)
+        {
+            return -1;
+        }
+    }
+    
+    public int posti_occupati_spettacolo(int id_spettacolo)
+    {
+        try
+        {
+            int posti = 0;
+            PreparedStatement ps = con.prepareStatement("SELECT count(*) AS conta FROM Prenotazione as PR WHERE PR.id_spettacolo = ?");
+            ps.setInt(1,id_spettacolo);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            if(rs.next())
+            {
+                posti = rs.getInt("conta");
+            }
+            
+            return posti;
+            
+        }
+        catch(SQLException sqlex)
+        {
+            return 0;
+        }
+    }
+    
+    public List<Utente> top_10_clienti()
+    {
+        try
+        {
+            PreparedStatement ps = con.prepareStatement("SELECT U.id_utente, SUM(P.prezzo) as totale FROM Utente as U, Prezzo as P, Prenotazione as PR WHERE U.ID_UTENTE = PR.ID_UTENTE AND PR.ID_PREZZO = P.ID_PREZZO GROUP BY U.ID_UTENTE ORDER BY totale");
+            List<Utente> lista = new ArrayList<>();
+            ResultSet rs = ps.executeQuery();
+            while(rs.next())
+            {
+                int id = rs.getInt("id_utente");
+                lista.add(getUtente(id));
+            }
+            return lista;
+        }
+        catch(SQLException sqlex)
+        {
+            return null;
+        }
+    }
+    
+    public double incassi_spettacolo(int id_spettacolo)
+    {
+        try
+        {
+            int incassi = 0;
+            PreparedStatement ps = con.prepareStatement("SELECT P.prezzo FROM Prezzo as P, Prenotazione as PR WHERE P.id_prezzo = PR.id_prezzo AND PR.id_spettacolo = ?");
+            ps.setInt(1,id_spettacolo);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            while(rs.next())
+            {
+                incassi += rs.getInt("prezzo");
+            }
+            
+            return incassi;
+            
+        }
+        catch(SQLException sqlex)
+        {
+            return 0;
+        }
+    }
     
     public String password_dimenticata(String email) throws NoSuchAlgorithmException, UnsupportedEncodingException
     {
@@ -194,6 +321,54 @@ public class DBManager implements Serializable {
         catch(SQLException sqlex)
         {
             return null;
+        }
+    }
+    
+    public boolean annullaTicket(int id_utente, int id_prenotazione)
+    {
+        int id_prezzo = -1;
+        int id_spettacolo = -1;
+        
+        try{
+            // seleziono l'id del prezzo e dello spettacolo
+            PreparedStatement ps = con.prepareStatement("SELECT id_prezzo, id_spettacolo FROM prenotazione WHERE id_prenotazione = ?");
+            ps.setInt(1, id_prenotazione);
+            ResultSet rs = ps.executeQuery();
+            
+            if(!rs.next())
+                return false;
+            
+            id_prezzo = rs.getInt("id_prezzo");
+            id_spettacolo = rs.getInt("id_spettacolo");
+            
+            // seleziono lo spettacolo, e controllo se è iniziato o no 
+            Spettacolo s = getSpettacolo(id_spettacolo);
+            Timestamp t = new Timestamp(new Date().getTime());
+            
+            if(t.after(s.getOra()))
+                return false;
+            
+            // cancello la prenotazione
+            ps = con.prepareStatement("DELETE FROM prenotazione WHERE id_prenotazione = ?");
+            ps.setInt(1, id_prenotazione);
+            ps.executeUpdate();
+            
+            // prendo il prezzo e lo assegno all'utente
+            Prezzo p = getPrezzo(id_prezzo);
+            p.setPrezzo(0.8f * p.getPrezzo());
+            
+            Utente u = getUtente(id_utente);
+            u.setCredito(u.getCredito()+p.getPrezzo());
+            
+            ps = con.prepareStatement("UPDATE utente SET credito = ? WHERE id_utente = ?");
+            ps.setDouble(1, u.getCredito());
+            ps.setInt(2, id_utente);
+            ps.executeUpdate();
+            return true;
+        }
+        catch(SQLException ex)
+        {
+            return false;
         }
     }
     
@@ -568,7 +743,7 @@ public class DBManager implements Serializable {
      */
     public boolean InserisciPrenotazione(Prenotazione p){
        try{
-            PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,?)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione, pagato) VALUES (?,?,?,?,?,false)");
             
             java.sql.Timestamp dataTmp = new java.sql.Timestamp(p.getDataOraOperazione().getTime());
             
@@ -589,7 +764,7 @@ public class DBManager implements Serializable {
      */
     public boolean AggiungiPrenotazione(int id_utente, Spettacolo s, int id_prezzo, Posto p){
        try{
-            PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione) VALUES (?,?,?,?,CURRENT_TIMESTAMP)");
+            PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione, pagato) VALUES (?,?,?,?,CURRENT_TIMESTAMP, false)");
             
             ps.setInt(1, id_utente);
             ps.setInt(2, s.getIDspettacolo());
@@ -639,6 +814,39 @@ public class DBManager implements Serializable {
         }
         
         return prenotazioni;
+    }
+    
+    public boolean paga_prenotazione(int id_prenotazione)
+    {
+        try{
+            PreparedStatement ps = con.prepareStatement("UPDATE prenotazione SET pagato = true WHERE id_prenotazione = ?");
+            ps.setInt(1, id_prenotazione);
+            ps.executeUpdate();
+            return true;
+        }
+        catch(SQLException sqlex)
+        {
+            return false;
+        }
+    }
+    
+    public boolean scala_soldi_da_conto(int id_utente, double credito)
+    {
+        try{
+            Utente u = getUtente(id_utente);
+            u.setCredito(u.getCredito()-credito);
+            if(u.getCredito()<0)
+                return false;
+            PreparedStatement ps = con.prepareStatement("UPDATE utente SET credito = ? WHERE id_utente = ?");
+            ps.setDouble(1, u.getCredito());
+            ps.setInt(2, id_utente);
+            ps.executeUpdate();
+            
+            return true;
+        }catch(SQLException sqlex)
+        {
+            return false;
+        }
     }
     
     /**
@@ -1149,22 +1357,7 @@ public class DBManager implements Serializable {
         
         return p;
     }
-    /**
-     *Imposta una prenotazione come pagata
-     */
-    public boolean setPrenotazionePagata(int id_prenotazione)
-    {
-        try{
-            PreparedStatement ps = con.prepareStatement("UPDATE prenotazione SET pagato = true WHERE id_prenotazione = ?");
-            
-            ps.setInt(1, id_prenotazione);
-    
-            ps.executeUpdate();
-            return true;  
-       }catch(SQLException ex){
-            return false;
-        }
-    }
+
 }
 
 
