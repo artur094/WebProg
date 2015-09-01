@@ -21,7 +21,7 @@ public class Films {
     public Films()
     {
         try{
-            dbm = new DBManager(Controller.URL_DB);
+            dbm = DBManager.getDBM();
         }catch(SQLException sqlex)
         {
            System.out.println(sqlex);

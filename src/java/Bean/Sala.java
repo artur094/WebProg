@@ -50,7 +50,7 @@ public class Sala {
     {
         this.id_spettacolo = id_spettacolo;
         try{
-            this.dbm = new DBManager(Controller.URL_DB);
+            this.dbm = DBManager.getDBM();
             Sala s = dbm.getSala(id_spettacolo);
             id_sala = s.getId_sala();
             nome = s.getNome();

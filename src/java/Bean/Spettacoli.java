@@ -20,7 +20,7 @@ public class Spettacoli {
     public Spettacoli()
     {
         try{
-            dbm = new DBManager(Controller.URL_DB);
+            dbm = DBManager.getDBM();
         }
         catch(SQLException sqlex){
             

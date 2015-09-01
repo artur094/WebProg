@@ -27,13 +27,14 @@ public class Film {
     private String regista;
     private String attori;
     private String frase;
+    private int incassi;
     
     public Film(){}
     
     public static Film getFilmfromDB(int id_film) throws SQLException
     {
         Film f = null;
-        DBManager dbm = new DBManager(Controller.URL_DB);
+        DBManager dbm = DBManager.getDBM();
         f = dbm.getFilm(id_film);
         
         return f;
@@ -42,7 +43,7 @@ public class Film {
     public static Film getFilmfromSpettacolo(int id_spettacolo) throws SQLException
     {
         Film f = null;
-        DBManager dbm = new DBManager(Controller.URL_DB);
+        DBManager dbm = DBManager.getDBM();
         f = dbm.getFilmFromSpettacolo(id_spettacolo);
         
         return f;
@@ -51,7 +52,7 @@ public class Film {
     public static Film getFilmfromDB(String titolo) throws SQLException
     {
         Film f = null;
-        DBManager dbm = new DBManager(Controller.URL_DB);
+        DBManager dbm = DBManager.getDBM();
         f = dbm.getFilm(titolo);
         
         return f;
@@ -63,6 +64,10 @@ public class Film {
 
     public void setId_spettacolo(Integer id_spettacolo) {
         this.id_spettacolo = id_spettacolo;
+    }
+
+    public double getIncassi() throws SQLException{
+        return (DBManager.getDBM().incassi_per_film(id_film));
     }
 
     

@@ -21,7 +21,7 @@ public class Pagamento {
     
     public Pagamento(int user_id) throws SQLException
     {
-        dbm = new DBManager(Controller.URL_DB);
+        dbm = DBManager.getDBM();
         this.user_id = user_id;
     }
     

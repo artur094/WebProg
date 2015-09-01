@@ -25,7 +25,7 @@ public class Posto {
     private boolean occupato;
 
     public static List<Posto> getPosti(String descrizioneSala) throws SQLException{
-        DBManager tmp = new DBManager(Controller.URL_DB);
+        DBManager tmp = DBManager.getDBM();
         return tmp.getPosti(descrizioneSala);
     }
     
