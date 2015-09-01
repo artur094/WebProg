@@ -112,6 +112,16 @@ public class Controller extends HttpServlet {
                     break;
                 reset_psw(email, request, response);
                 break;
+            case "psw":
+                String code = request.getParameter("code");
+                String tmp_email = dbm.CheckResetCode(code);
+                if(tmp_email != null)
+                {
+                    request.getSession().setAttribute("email", tmp_email);
+                    forward_to(request, response, ("/reset.jsp"));
+                }
+                else
+                    forward_to(request, response, "/error.jsp");
             default:
                 forward_to(request, response, "/error.jsp");
                 break;
@@ -132,7 +142,7 @@ public class Controller extends HttpServlet {
             String testo="";
             testo+="Ciao! Hai richiesto il reset della password. Nel caso non sia stato tu, non serve che vai sul link sottostante.\n";
             testo+="Vai sul link per resettare la password:\n";
-            testo+=request.getServerName()+"Controller?op=psw&code="+hash;
+            testo+="http://"+request.getServerName()+":"+request.getServerPort()+ "/Cineland/Controller?op=psw&code="+hash;
             ValidationEmail ve = new ValidationEmail(email, testo);
             ve.InviaReset();
         }
@@ -496,8 +506,7 @@ public class Controller extends HttpServlet {
         super.init(); //To change body of generated methods, choose Tools | Templates.
         
         try{
-            dbm = new DBManager("jdbc:derby://localhost:1527/cineDB");
-            dbm = new DBManager(URL_DB);
+            dbm = DBManager.getDBM();
         }
         catch(SQLException sqlex){
             System.out.println("Impossibile connetersi al db! Controllare i dati per il database....Dettagli eccezione:" + sqlex.toString());
