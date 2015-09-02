@@ -778,6 +778,30 @@ public class DBManager implements Serializable {
         }
     }
     
+    public void InserisciPrenotazioneCoordinate(int riga, int colonna, int id_proiezione, int id_utente){
+        try{
+            Sala s = getSala(id_proiezione);
+            PreparedStatement ps = con.prepareStatement("SELECT * FROM posto WHERE id_sala = ? and riga =? and colonna = ?");
+            
+            ps.setInt(1, s.getId_sala());
+            ps.setInt(2, riga);
+            ps.setInt(3, colonna);
+            
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                int id_posto = rs.getInt("id_posto");
+                PreparedStatement queryInserimento = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione, pagato) VALUES (?,?,1,?,CURRENT_TIMESTAMP, false) ");
+                 ps.setInt(1, id_utente);
+                 ps.setInt(2, id_proiezione);
+                 ps.setInt(3, id_posto);      
+                 ps.executeUpdate();
+            }
+            
+        }catch(SQLException ex){
+            System.out.println(ex);
+        }
+    }
+    
     /**
      *Ritorna tutte le prenotazioni non pagate da un certo utente.
      */

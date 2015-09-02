@@ -81,7 +81,7 @@ display: table-cell;
     text-decoration: none;
 }
 
-.btnLogout{   <!-- background in stylegradienti -->
+.btnLogout{   /* background in stylegradienti */
     font: inherit;
     vertical-align: baseline;
     margin-left : 80%;
@@ -195,38 +195,38 @@ table, th, td {
     z-index: 10;
 }
 
-#containTabPrezzi{   <!-- background in stylegradienti -->
+#containTabPrezzi{   /* background in stylegradienti */
     position: absolute;
     display:none;
     //z-index: 2;
     top:0px;
 }
-#containTabInfo{   <!-- background in stylegradienti -->
+#containTabInfo{  /* background in stylegradienti */
     position: absolute;
     display:none;
      //   z-index: 3;
     top:0px;
 }
 
-#containTabOrariContatti{  <!-- background in stylegradienti -->
+#containTabOrariContatti{ /* background in stylegradienti */
     position: absolute;
     display: none;
      //   z-index: 4;
     top:0px;
 }
-#containTabSale{   <!-- background in stylegradienti -->
+#containTabSale{   /* background in stylegradienti */
     position: absolute;
     display: none;
         z-index: 5;
     top:0px;
 }
-#containTabPreview{ <!-- background in stylegradienti -->
+#containTabPreview{ /* background in stylegradienti */
     position: absolute;
     display: block;
      //   z-index: 6;
     top:0px;
 }
-#containTabFilm{ <!-- background in stylegradienti -->
+#containTabFilm{ /* background in stylegradienti */
     position: absolute;
     display: none;
     //    z-index: 7;

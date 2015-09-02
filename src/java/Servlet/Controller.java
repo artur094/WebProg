@@ -185,7 +185,8 @@ public class Controller extends HttpServlet {
         
         
     }
-    
+    /*
+        //dati inviati dal client:id_utente posti numero_ridotti  id_proiezione
     protected void prenotazione(HttpServletRequest request, HttpServletResponse response)
     {
         List<Prenotazione> prenotazioni = new ArrayList<Prenotazione>();
@@ -194,7 +195,7 @@ public class Controller extends HttpServlet {
         int n_ridotti = Integer.parseInt(request.getParameter("ridotto"));
         int n_militari = Integer.parseInt(request.getParameter("militare"));
         int n_disabili = Integer.parseInt(request.getParameter("disabile"));
-        
+   
         Sala sala = (Sala)(request.getSession().getAttribute("sala"));
         Spettacolo s = (Spettacolo)(request.getSession().getAttribute("spettacolo"));
         Utente u = (Utente)(request.getSession().getAttribute("user"));
@@ -273,18 +274,36 @@ public class Controller extends HttpServlet {
                     prenotazioni.add(pre);
                 }
             }
-        }
+        }*/
+   
+    //dati inviati dal client:id_utente posti numero_ridotti  id_proiezione
+    protected void prenotazione(HttpServletRequest request, HttpServletResponse response)
+    {
+        List<Prenotazione> prenotazioni = new ArrayList<Prenotazione>();
+        int n_normali = Integer.parseInt(request.getParameter("normale"));
+        int n_studenti = Integer.parseInt(request.getParameter("studente"));
+        int n_ridotti = Integer.parseInt(request.getParameter("ridotto"));
+        int n_militari = Integer.parseInt(request.getParameter("militare"));
+        int n_disabili = Integer.parseInt(request.getParameter("disabile"));
+   
+        int id_utente = Integer.parseInt(request.getParameter("id_utente"));
+        int numero_posti = Integer.parseInt(request.getParameter("n_posti"));
+        int id_proiezione = Integer.parseInt(request.getParameter("id_proiezione"));
+        String posti = request.getParameter("posti");
         
-        request.getSession().setAttribute("lista_prenotazioni", prenotazioni);
-        request.getSession().setAttribute("return", "auth/payment.jsp");
-        
-        if(u!=null)
-        {
-            forward_to(request, response, "/auth/payment.jsp");
-            return;
-        }
-        else
+   
+        String[] coordinatePosti = posti.split(";");
+       
+        try{
+            Sala s = dbm.getSala(id_proiezione);
+            for(int i=0; i < coordinatePosti.length;i++){
+                String[] coordinata = coordinatePosti[i].split(",");
+                dbm.InserisciPrenotazioneCoordinate(Integer.parseInt(coordinata[0]), Integer.parseInt(coordinata[1]), id_proiezione, id_utente);
+            }
+        }catch(SQLException ex){
+            System.out.println(ex.toString());
             forward_to(request, response, "/index.jsp");
+        }
     }
     
     protected void addSpettacolo(HttpServletRequest request, HttpServletResponse response)
@@ -336,7 +355,6 @@ public class Controller extends HttpServlet {
             forward_to(request, response, "/error.jsp");
             return;
         }
-//        
         forward_to(request, response, "/auth/prenotazione.jsp");
         request.getSession().setAttribute("sala", sala);
         forward_to(request, response, "/prenotazione.jsp");

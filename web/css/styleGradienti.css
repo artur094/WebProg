@@ -29,7 +29,7 @@
     background: linear-gradient(45deg,  #54c128 0%,#52b152 24%,#20776a 76%,#005975 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#54c128', endColorstr='#005975',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
-#containTabInfo{   <!-- background in stylegradienti -->
+#containTabInfo{   /* background in stylegradienti */
           /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#dbdb1a+0,eef473+25,ce5f1e+69,ce0000+100 */
     background: #dbdb1a; /* Old browsers */
     background: -moz-linear-gradient(45deg,  #dbdb1a 0%, #eef473 25%, #ce5f1e 69%, #ce0000 100%); /* FF3.6+ */
@@ -53,7 +53,7 @@
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f9fcff', endColorstr='#98bede',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
-#containTabSale{   <!-- background in stylegradienti -->
+#containTabSale{   /* background in stylegradienti */
        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f3c5bd+0,ea2803+43,ea2803+43,e86c57+50,ff6600+75,c72200+100 */
     background: #f3c5bd; /* Old browsers */
     background: -moz-linear-gradient(45deg,  #f3c5bd 0%, #ea2803 43%, #ea2803 43%, #e86c57 50%, #ff6600 75%, #c72200 100%); /* FF3.6+ */
@@ -65,7 +65,7 @@
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3c5bd', endColorstr='#c72200',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
-#containTabPreview{ <!-- background in stylegradienti -->
+#containTabPreview{ /* background in stylegradienti */
        /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#cedbe9+0,aac5de+17,6199c7+50,3a84c3+51,419ad6+59,4bb8f0+71,3a8bc2+84,26558b+100;Blue+Gloss */
     background: #cedbe9; /* Old browsers */
     background: -moz-linear-gradient(45deg,  #cedbe9 0%, #aac5de 17%, #6199c7 50%, #3a84c3 51%, #419ad6 59%, #4bb8f0 71%, #3a8bc2 84%, #26558b 100%); /* FF3.6+ */

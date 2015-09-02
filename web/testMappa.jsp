@@ -29,8 +29,24 @@
             d.setHours(0);
             d.setMinutes(0);
             String s = dbm.disegnaMappa(d, "DriveIn");
+            
         %>
         
         <%=s%>
+        <div id="paga">PAGA</div>
     </body>
+    <script>
+        $(document).ready(function(){//sala spettacolo user
+            $("#paga").click(function(){
+                $.post("Controller",
+                {
+                 op:"prenota";
+                 
+                },
+                
+                );
+                });
+            
+        });
+    </script>
 </html>

@@ -48,7 +48,7 @@ header{
     background-repeat: no-repeat;
 }
 
-#btnAccedi{   <!-- background in stylegradienti -->
+#btnAccedi{   /*background in stylegradient*/
     display: table-cell;
     width: 140px;
     //height: 30px;

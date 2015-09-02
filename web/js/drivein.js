@@ -16,8 +16,6 @@ $( document ).ready(function() {
             {
                 $(this).removeClass('prenotato');
                 checkCar($(this).parent());
-               // var p = postiPrenotati.index($(this).data("posto"));
-                postiPrenotati.r
                 prenotati--;
             }
             else
@@ -29,8 +27,6 @@ $( document ).ready(function() {
                         $(this).addClass('prenotato');
                         checkCar($(this).parent());
                         prenotati++;
-                        lista+=($(this).data("posto")+";");
-                        alert(lista);
                     }
                     else
                     {
