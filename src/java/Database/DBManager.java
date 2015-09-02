@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -1356,6 +1357,41 @@ public class DBManager implements Serializable {
         }
         
         return p;
+    }
+    
+    public String disegnaMappa(Date date, String nomeSala){
+        String contenuto = "";
+        if(nomeSala.equals("DriveIN")){
+            contenuto = driveIn(date,2);
+        }
+        return contenuto;
+    }
+    
+    public String driveIn(Date date, int id_Sala){
+        String outputMappa = "";
+        try{            
+            PreparedStatement ps = con.prepareStatement("SELECT id_spettacolo FROM spettacolo WHERE YEAR(data_ora) = ? AND MONTH(data_ora) = ? AND DAY(data_ora) = ? AND HOUR(data_ora)=? AND MINUTE(data_ora) = ?");
+            ps.setInt(1, date.getYear());
+            ps.setInt(2, date.getMonth());
+            ps.setInt(3, date.getDay());
+            ps.setInt(4, date.getHours());
+            ps.setInt(5, date.getMinutes());
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+               Sala s = new Sala(this,rs.getInt("id_spettacolo"));
+               String mappa = s.toString();
+               ArrayList<List<String>> matrice = new ArrayList<List<String>>();
+               int i=0;
+               for(String vettoreRiga:mappa.split(";")){
+                   matrice.add(i,Arrays.asList(vettoreRiga));
+                   i++;
+               }
+               
+            }
+        }catch(SQLException ex){
+            outputMappa = ex.toString();
+        }
+        return outputMappa;
     }
 
 }

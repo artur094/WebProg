@@ -170,7 +170,7 @@ public class Controller extends HttpServlet {
             for (int i = 0; i < lista.size(); i++) {
                 if(request.getParameter((String.valueOf(lista.get(i).getPrenotazioneID()))) != null)
                 {
-                    dbm.setPrenotazionePagata(lista.get(i).getPrenotazioneID());
+                 //   dbm.setPrenotazionePagata(lista.get(i).getPrenotazioneID());
                 }
             }
             forward_to(request, response, "/auth/user_profile.jsp");
