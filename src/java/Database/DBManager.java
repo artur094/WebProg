@@ -1361,19 +1361,19 @@ public class DBManager implements Serializable {
     
     public String disegnaMappa(Date date, String nomeSala){
         String contenuto = "";
-        if(nomeSala.equals("DriveIN")){
-            contenuto = driveIn(date,2);
+        if(nomeSala.equals("DriveIn")){
+            contenuto = driveIn(date);
         }
         return contenuto;
     }
     
-    public String driveIn(Date date, int id_Sala){
+    public String driveIn(Date date){
         String outputMappa = "";
         try{            
             PreparedStatement ps = con.prepareStatement("SELECT id_spettacolo FROM spettacolo WHERE YEAR(data_ora) = ? AND MONTH(data_ora) = ? AND DAY(data_ora) = ? AND HOUR(data_ora)=? AND MINUTE(data_ora) = ?");
             ps.setInt(1, date.getYear());
             ps.setInt(2, date.getMonth());
-            ps.setInt(3, date.getDay());
+            ps.setInt(3, date.getDate());
             ps.setInt(4, date.getHours());
             ps.setInt(5, date.getMinutes());
             ResultSet rs = ps.executeQuery();
@@ -1382,11 +1382,61 @@ public class DBManager implements Serializable {
                String mappa = s.toString();
                ArrayList<List<String>> matrice = new ArrayList<List<String>>();
                int i=0;
-               for(String vettoreRiga:mappa.split(";")){
-                   matrice.add(i,Arrays.asList(vettoreRiga));
+               for(String vettoreRiga:mappa.split("\n")){
+                   matrice.add(i,Arrays.asList(vettoreRiga.split(",")));
                    i++;
                }
                
+               matrice.get(0).set(0, "2");
+               matrice.get(0).set(1, "2");
+               matrice.get(1).set(0, "3");
+               
+               int i_riga=0;
+               int i_colonna=0;
+               outputMappa+="<div class=\"container-drivein\" id=\"c-drivein\">\n" +
+"            <div class=\"drivein\">\n" +
+"                <div class=\"drivein-opacita\">&nbsp;</div>";
+               for(List<String> riga:matrice)
+               {
+                   outputMappa+="<div class=\"car-lane\" id=\"car-lane"+i_riga+"\">";
+                   for(String colonna:riga)
+                   {
+                       if(i_colonna%2==0)
+                       {
+                         outputMappa+="<div class=\"car\">";
+                         outputMappa+="<span data-posto=\""+i_riga+","+i_colonna+"\" class=\"sedileL ";
+                         if(colonna.equals("2"))//prenotato        
+                         {
+                             outputMappa+="taken\"";
+                         }
+                         if(colonna.equals("3"))//rotto
+                         {
+                             outputMappa+="\" style=\"visibility:hidden\"";
+                         }
+                         outputMappa+=" data-value=\""+colonna+"\">&nbsp;</span>";
+                         
+                       }
+                       else
+                       {
+                           outputMappa+="<span data-posto=\""+i_riga+","+i_colonna+"\" class=\"sedileR ";
+                           if(colonna.equals("2"))//prenotato        
+                            {
+                                outputMappa+="taken\"";
+                            }
+                            if(colonna.equals("3"))//rotto
+                            {
+                                outputMappa+="\" style=\"visibility:hidden\"";
+                            }
+                            outputMappa+=" data-value=\""+colonna+"\">&nbsp;</span></div>";
+                       }
+                       //outputMappa+="<div data-posto=\""+i_riga+","+i_colonna+"\">"+colonna+"</div>";
+                       i_colonna++;
+                   }
+                   outputMappa+="</div>";
+                   i_riga++;
+                   i_colonna=0;
+               }
+               outputMappa+="</div></div></div>";
             }
         }catch(SQLException ex){
             outputMappa = ex.toString();
