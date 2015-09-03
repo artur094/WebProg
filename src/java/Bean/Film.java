@@ -8,6 +8,8 @@ package Bean;
 import Database.DBManager;
 import Servlet.Controller;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  *
@@ -28,7 +30,7 @@ public class Film {
     private String attori;
     private String frase;
     private int incassi;
-    
+      
     public Film(){}
     
     public static Film getFilmfromDB(int id_film) throws SQLException

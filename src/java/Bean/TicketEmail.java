@@ -77,7 +77,7 @@ public class TicketEmail {
             sb.append("Tipo Biglietto: " + tipoBiglietto);
             sb.append("Posto: " + postoRichiesto);
             sb.append("Film: " + spettacoloRichiesto.getTitolo());
-            sb.append("Ora: " + spettacoloRichiesto.getOra());
+            sb.append("Ora: " + spettacoloRichiesto.getGiorno());
             
             testo.setText(sb.toString());
             

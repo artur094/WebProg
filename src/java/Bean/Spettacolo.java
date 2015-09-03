@@ -1,4 +1,4 @@
-/*
+   /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -6,6 +6,7 @@
 package Bean;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -18,7 +19,7 @@ public class Spettacolo {
     private int durata;
     private String trama;
     private String urlLocandina;
-    private Date ora;
+    private Date giorno;
     private String sala;
     private String regista;
     private String attori;
@@ -27,7 +28,16 @@ public class Spettacolo {
     private int IDfilm;
     private int IDsala;
     private int IDspettacolo;
-
+    private List<Date> orariDisponibili;
+    
+    public List<Date> getOrariSpettacolo(){
+        return orariDisponibili;
+    }
+    
+    public void setOrariSpettacolo(List<Date> s){
+        orariDisponibili = s;
+    }
+    
     public String getRegista() {
         return regista;
     }
@@ -69,12 +79,12 @@ public class Spettacolo {
         this.IDfilm = IDfilm;
     }
     
-    public Date getOra() {
-        return ora;
+    public Date getGiorno() {
+        return giorno;
     }
 
-    public void setOra(Date ora) {
-        this.ora = ora;
+    public void setGiorno(Date ora) {
+        this.giorno = ora;
     }
 
     public String getSala() {

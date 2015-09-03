@@ -12,16 +12,19 @@ import Bean.Posto;
 import Bean.Prenotazione;
 import Bean.Sala;
 import Bean.Security;
+import Bean.Spettacoli;
 import Bean.Spettacolo;
 import Bean.Utente;
 import Database.DBManager;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -111,6 +114,9 @@ public class Controller extends HttpServlet {
                 if(email == null)
                     break;
                 reset_psw(email, request, response);
+                break;
+            case "hour":
+                calcolaOra(request,response);
                 break;
             case "psw":
                 String code = request.getParameter("code");
@@ -530,6 +536,32 @@ public class Controller extends HttpServlet {
             System.out.println("Impossibile connetersi al db! Controllare i dati per il database....Dettagli eccezione:" + sqlex.toString());
             log(sqlex.toString());
         }
+    }
+
+    private void calcolaOra(HttpServletRequest request, HttpServletResponse response) {
+        int id_film = Integer.parseInt(request.getParameter("f"));
+        String data = request.getParameter("date");
+       SimpleDateFormat dateFormat;
+        Spettacoli s = new Spettacoli();
+        //Date parsedDate = new Date();
+        try{
+        Date d = new Date();
+        String dateConvert ="";
+        dateConvert = data.split("/")[1]+"-"+data.split("/")[0]+"-"+data.split("/")[2];
+        dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        Date parsedDate = dateFormat.parse(dateConvert);
+       PrintWriter out = response.getWriter();
+        out.append(s.getSpettacoliDisponibili(id_film,parsedDate));
+        out.close();
+       int sadf =123;
+        }
+        catch(Exception ex){
+        
+        }
+       
+      /* d.setYear(Integer.parseInt(data.split("/")[2])-1900);
+       d.setMonth(Integer.parseInt(data.split("/")[0])-1);
+       d.setDate(Integer.parseInt(data.split("/")[1]));*/
     }
 
 }

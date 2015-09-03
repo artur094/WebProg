@@ -29,7 +29,7 @@
 <body>
 <header>
     <div class="container-logo">
-        <div class="logo" style="PADDING-TOP: 20px"> <a href="index.html" class="a_logo"></a></div>
+        <div class="logo" style="PADDING-TOP: 20px"> <a href="index.jsp" class="a_logo"></a></div>
     </div>
     <div class="login">
         <div id="btnAccedi" class="btnAccedi">Logout</div> 

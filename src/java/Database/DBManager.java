@@ -346,7 +346,7 @@ public class DBManager implements Serializable {
             Spettacolo s = getSpettacolo(id_spettacolo);
             Timestamp t = new Timestamp(new Date().getTime());
             
-            if(t.after(s.getOra()))
+            if(t.after(s.getGiorno()))
                 return false;
             
             // cancello la prenotazione
@@ -437,7 +437,7 @@ public class DBManager implements Serializable {
                     spect.setTrama(rs.getString("trama"));
                     spect.setUrlTrailer(rs.getString("url_trailer"));
                     spect.setUrlLocandina(rs.getString("url_locandina"));
-                    spect.setOra(rs.getDate("data_ora"));
+                    spect.setGiorno(rs.getDate("data_ora"));
                     spect.setSala(rs.getString("sala"));
                     listSpettacoli.add(spect);
                 }
@@ -603,6 +603,102 @@ public class DBManager implements Serializable {
         
         return lista;
     }
+ 
+     public List<Date> getGiornate(Film f) throws SQLException{
+        List<Spettacolo> listaSpettacoli = new ArrayList<>();
+        List<Date> orariSpettacolo = new ArrayList<>();
+        
+        PreparedStatement selezioneSpettacoli = con.prepareStatement("SELECT * FROM spettacolo WHERE id_film = ? ORDER BY data_ora");
+        selezioneSpettacoli.setInt(1, f.getId_film());
+        
+        ResultSet rs = selezioneSpettacoli.executeQuery();
+        while(rs.next()){
+           int id_corrente = rs.getInt("id_film");
+           if(orariSpettacolo.isEmpty()){
+                orariSpettacolo.add(Date.from(rs.getTimestamp("data_ora").toInstant()));
+           }
+           else{
+                for(Spettacolo s: listaSpettacoli){
+                    if(s.getIDfilm()== id_corrente)
+                        orariSpettacolo.add(rs.getDate("data_ora"));
+                } 
+           }
+           Spettacolo s = new Spettacolo();
+           s.setSala(rs.getString("id_sala"));
+           s.setIDfilm(rs.getInt("id_film"));
+           s.setGiorno(rs.getDate("data_ora"));
+           
+           s.setOrariSpettacolo(orariSpettacolo);
+           listaSpettacoli.add(s);
+        }
+        
+        return orariSpettacolo;
+    }
+    
+    public List<Date> getDateFilm(Film f) throws SQLException{
+        List<Spettacolo> listaSpettacoli = new ArrayList<>();
+        List<Date> orariSpettacolo = new ArrayList<>();
+        
+        PreparedStatement selezioneSpettacoli = con.prepareStatement("SELECT * FROM spettacolo WHERE id_film = ? ORDER BY data_ora");
+        selezioneSpettacoli.setInt(1, f.getId_film());
+        ResultSet rs = selezioneSpettacoli.executeQuery();
+        while(rs.next()){
+           int id_corrente = rs.getInt("id_film");
+           if(orariSpettacolo.isEmpty()){
+                orariSpettacolo.add(Date.from(rs.getTimestamp("data_ora").toInstant()));
+           }
+           else{
+                for(Spettacolo s: listaSpettacoli){
+                    if(s.getIDfilm()== id_corrente)
+                        orariSpettacolo.add(rs.getDate("data_ora"));
+                } 
+           }
+           Spettacolo s = new Spettacolo();
+           s.setSala(rs.getString("id_sala"));
+           s.setIDfilm(rs.getInt("id_film"));
+           s.setGiorno(rs.getDate("data_ora"));
+           
+           s.setOrariSpettacolo(orariSpettacolo);
+           listaSpettacoli.add(s);
+        }
+        
+        return orariSpettacolo;
+    }
+    
+        public List<Date> getOrariGiornata(int id_film,Date giorno) throws SQLException{
+        List<Spettacolo> listaSpettacoli = new ArrayList<>();
+        List<Date> orariSpettacolo = new ArrayList<>();
+        
+        PreparedStatement selezioneSpettacoli = con.prepareStatement("SELECT * FROM spettacolo WHERE id_film = ? AND YEAR(data_ora) = ? AND MONTH(data_ora) = ? AND DAY(data_ora) = ? ORDER BY data_ora");
+        selezioneSpettacoli.setInt(1, id_film);
+        selezioneSpettacoli.setInt(2, giorno.getYear()+1900);
+        selezioneSpettacoli.setInt(3, giorno.getMonth()+1);
+        selezioneSpettacoli.setInt(4, giorno.getDate());
+        
+        ResultSet rs = selezioneSpettacoli.executeQuery();
+        while(rs.next()){
+           int id_corrente = rs.getInt("id_film");
+           if(orariSpettacolo.isEmpty()){
+                orariSpettacolo.add(Date.from(rs.getTimestamp("data_ora").toInstant()));
+           }
+           else{
+                for(Spettacolo s: listaSpettacoli){
+                    if(s.getIDfilm()== id_corrente)
+                        orariSpettacolo.add(rs.getDate("data_ora"));
+                } 
+           }
+           Spettacolo s = new Spettacolo();
+           s.setSala(rs.getString("id_sala"));
+           s.setIDfilm(rs.getInt("id_film"));
+           s.setGiorno(rs.getDate("data_ora"));
+           
+           s.setOrariSpettacolo(orariSpettacolo);
+           listaSpettacoli.add(s);
+        }
+        
+        return orariSpettacolo;
+    }
+    
     
      /**
      *Ritorna tutti gli spettacoli contenuti nel DB
@@ -633,7 +729,7 @@ public class DBManager implements Serializable {
                     spect.setTrama(rs.getString("trama"));
                     spect.setUrlTrailer(rs.getString("url_trailer"));
                     spect.setUrlLocandina(rs.getString("url_locandina"));
-                    spect.setOra(rs.getDate("data_ora"));
+                    spect.setGiorno(rs.getDate("data_ora"));
                     spect.setSala(rs.getString("sala"));
                 }
             }
@@ -1007,7 +1103,7 @@ public class DBManager implements Serializable {
         try{
             PreparedStatement ps = con.prepareStatement("INSERT INTO spettacolo(id_film,data_ora,id_sala) VALUES (?,?,?)");
             ps.setInt(1,s.getIDfilm());
-            ps.setTimestamp(2, new Timestamp(s.getOra().getTime()));
+            ps.setTimestamp(2, new Timestamp(s.getGiorno().getTime()));
             ps.setInt(3, s.getIDsala());
             ps.executeUpdate();
             return true;

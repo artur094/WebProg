@@ -1,4 +1,8 @@
 
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.util.Date"%>
+<%@page import="Bean.Spettacolo"%>
+<%@page import="Bean.Spettacoli"%>
 <%-- 
     Document   : prenotazione
     Created on : 23-lug-2015, 21.35.09
@@ -13,9 +17,14 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <%
+    Spettacoli s = new Spettacoli();
+    
     int id_spettacolo = Integer.parseInt(request.getParameter("id"));
     Sala sala = new Sala(id_spettacolo);
     Film f = Film.getFilmfromSpettacolo(id_spettacolo);
+    //List<Date> orariDisponibili = orariDisponibili = s.getSpettacoliDisponibili(f,new Date());
+    String orariDisponibili = s.getSpettacoliDisponibili(f.getId_film(), new Date());
+    Date maximumDate = s.getMaxData(f);
 %>
 <!DOCTYPE html>
 <html>
@@ -31,13 +40,38 @@
         <link href="css/login.css" type="text/css" rel="stylesheet">
         <!--<link rel="stylesheet" href="jquery-ui-1.7.2.custom.css" type="text/css">-->
         <script>
-  $(function() {
+  //$(function() {
+  $(document).ready(function()
+  {
 	$.datepicker.setDefaults($.datepicker.regional['it']);
-    $( "#datepicker" ).datepicker({
-        minDate: 0,
-        maxDate: new Date(2015, 6,28)
+        //alert($("#id_film").val());
+        $( "#datepicker" ).datepicker
+        (
+            {
+                onSelect: function()
+                {
+                    var dateObject = $(this).datepicker('getDate'); 
+                    alert($("#id_film").val()+"    "+$("#datepicker").datepicker({ dateFormat: 'yyyy/mm/dd' }).val());
+                    $("#orario").empty();
+                    //var ahah = ""; 
+                    $.ajax({
+                        type : 'POST',
+                        url : 'Controller',           
+                        data: {
+                            op : "hour",
+                            f : $('#id_film').val(),
+                            date : $("#datepicker").datepicker({ dateFormat: 'yyyy/mm/dd' }).val()
+                        },
+                        success:function (data) {
+                            alert(data);
+                            $("#orario").append(data);}
+                        }); 
+                },
+                minDate: 0, 
+                maxDate: new Date(<%=(maximumDate.getYear()+1900) + "," + maximumDate.getMonth() + "," + maximumDate.getDate()%>)
+            }
+        );
     });
-  });
   </script>
     <%
         switch(sala.getNome()){
@@ -58,6 +92,7 @@
     %>
     </head>
     <body>
+        <input type="hidden" value="<%= f.getId_film()%>" name="id_film" id="id_film"/>
         <header>
         <div class="container-logo">
             <div class="logo" style="padding-top:20px;"> <a href="index.jsp" class="a_logo"></a></div>
@@ -69,231 +104,7 @@
     </header>
         
         <div class="frameSala">
-                <%                    
-                    String[][] mappa = sala.getMappa();
-                    
-                    if(sala.getNome().equals("Sala Parcheggio"))
-                    {
-                        out.println("<div class='container-drivein' id='c-drivein'>");
-                        out.println("<div class='drivein'>");
-                        out.println("<div class='drivein-opacita'>&nbsp</div>");
-                        for(int i=0; i<sala.getMax_righe();i++)
-                        {
-                            out.println("<div class='car-lane' id='car-lane"+(1+i)+"'>");
-                            for(int j=0; j<sala.getMax_colonne();j++)
-                            {
-                                out.println("<div class='car' id='car"+(1+j)+"'>");
-                                out.println("<span class='sedileL'></span>");
-                                out.println("<span class='sedileR'></span>");
-                                out.println("</div>");
-                            }
-                            out.println("</div>");
-                        }
-                        out.println("</div>");
-                        out.println("</div>");
-                    }
-                    else if(sala.getNome().equals("Sala Cuori"))
-                    {
-                        out.println("<div class='sweet'>");
-                        for(int i=0; i<sala.getMax_righe();i++)
-                            {
-                                out.println("<div class='rigaLetti'>");
-                                for(int j=0; j<sala.getMax_colonne();j++)
-                                {
-                                    out.println("<div class='letto'>");
-                                    out.println("<div class='materasso'></div>");
-                                    out.println("<div class='pillowL'></div>");
-                                    out.println("<div class='pillowR'></div>");
-                                    out.println("</div>");
-                                }
-                                out.println("</div>");
-                            }
-                        out.println("</div>");
-                    }
-                    else if(sala.getNome().equals("Sala Piscina"))
-                    {
-                        out.println("<div class='container-pool'>");
-                        out.println("<div class='swimPool'>");
-                        out.println("<div class='swimPool-opacita'>&nbsp</div>");
-                        for(int i=0; i<sala.getMax_righe();i++)
-                        {
-                            out.println("<div class='row-pool'>");
-                            for(int j=0; j<sala.getMax_colonne();j++)
-                            {
-                                out.println("<div class='pool'>");
-                                out.println("<div class='water'></div>");
-                                out.println("<div class='pool-l1'></div>");
-                                out.println("<div class='pool-l2'></div>");
-                                out.println("<div class='pool-l3'></div>");
-                                out.println("<div class='pool-l4'></div>");
-                                out.println("<div class='belt posto-top'>&nbsp</div>");
-                                out.println("<div class='belt posto-bot'>&nbsp</div>");
-                                out.println("<div class='belt posto-left'>&nbsp</div>");
-                                out.println("<div class='belt posto-right'>&nbsp</div>");
-                                out.println("</div>");
-                            }
-                            out.println("</div>");
-                        }
-                        out.println("</div>");
-                        out.println("</div>");
-                    }
-                    else if(sala.getNome().equals("Sala Nerd"))
-                    {
-                        out.println("<div class='heroes'>");
-                        for(int i=0; i<sala.getMax_righe();i++)
-                        {
-                            out.println("<div class='rigaPoltrona'>");
-                            for(int j=0; j<sala.getMax_colonne();j++)
-                            {
-                                String url_img = "img/nerd/";
-                                switch(j)
-                                {
-                                    case 0:
-                                        url_img+="1437399069_Loki.png";
-                                        break;
-                                    case 1:
-                                        url_img+="1437399067_Black_Widow.png";
-                                        break;
-                                    case 2:
-                                        url_img+="1437399065_Thor.png";
-                                        break;
-                                    case 3:
-                                        url_img+="1437399063_Hawkeye.png";
-                                        break;
-                                    case 4:
-                                        url_img+="1437399062_Captain_America.png";
-                                        break;
-                                    case 5:
-                                        url_img+="1437399056_Iron_Man.png";
-                                        break;
-                                    case 6:
-                                        url_img+="1437399059_Hulk.png";
-                                        break;
-                                    case 7:
-                                        url_img+="dragonball2_128.png";
-                                        break;
-                                    case 8:
-                                        url_img+="dragonball3_128.png";
-                                        break;
-                                    case 9:
-                                        url_img+="bender_128.png";
-                                        break;
-                                    default:
-                                        url_img+="darthvader.png";
-                                        break;
-                                                                    
-                                }
-                                
-                                out.println("<span class='poltrona'>");
-                                out.println("<div class='polt_bottom'></div>");
-                                out.println("<div class='polt'>&nbsp</div>");
-                                out.println("<div class='polt_img' style='background-image: url("+url_img+");'></div>");
-                                out.println("<div class='polt_upper'></div>");
-                                out.println("</span>");
-                            }
-                            out.println("</div>");
-                        }
-                        out.println("</div>");
-                    }
-                    
-                    
-                    
-                    /*
-                    if(d.equals("DriveIn")){
-                        out.println("<div class=\"container-drivein\" id=\"c-drivein\">");
-                        out.println("<div class=\"drivein\">");
-                        out.println("<div class=\"drivein-opacita\">&nbsp;</div>");
-                        boolean destro = false;
-                        
-                        for(int i = 0; i < mappa.length; i++){
-                            out.println("<div class=\"car-lane\" id=\"car-lane" + i + "\">");
-                            for(int j = 0; j < mappa[j].length;j++){
-                                out.println("<div class=\"car\" id=\"car" + i + "\">");
-                                if(destro){
-                                    if(mappa[i][j].equals("0")) 
-                                        out.println("<span class=\"sedileL\">&nbsp;</span>");
-                                    else{
-                                        out.println("<span class=\"sedileL taken\">&nbsp;</span>");
-                                    }
-                                }else{
-                                    if(mappa[i][j].equals("0")) 
-                                        out.println("<span class=\"sedileR\">&nbsp;</span>");
-                                    else{
-                                        out.println("<span class=\"sedileR taken\">&nbsp;</span>");
-                                    }
-                                }
-                            }
-                        }
-                        out.println("</div>");
-                        out.println("</div>");
-                    }
-                    if(d.equals("Sweet")){
-                        
-                        out.println("<div class=\"sweet\">");
-                        
-                        boolean destro = true;
-                        
-                        for(int i = 0; i < mappa.length; i++){
-                            out.println("<div class=\"rigaLetti\"");
-                            for(int j = 0; j < mappa[j].length;j++){
-                                out.println("<div class=\"materasso\">");
-                                out.println("</div>");
-                                if(destro){
-                                    if(mappa[i][j].equals("0")) 
-                                        out.println("<span class=\"pillowL\">&nbsp;</span>");
-                                    else{
-                                        out.println("<span class=\"pillowL taken\">&nbsp;</span>");
-                                    }
-                                    destro = false;
-                                }else{
-                                    if(mappa[i][j].equals("0")) 
-                                        out.println("<span class=\"pillowR\">&nbsp;</span>");
-                                    else{
-                                        out.println("<span class=\"pillowR taken\">&nbsp;</span>");
-                                    }
-                                    destro = true;
-                                }
-                            }
-                        }
-                        out.println("</div>");
-                    }
-                    if(d.equals("Piscina")){
-                        
-                    }
-                    if(d.equals("Nerd")){
-                        out.println("<div class=\"heroes\">");
-                        int contatorePoltrona = 0;
-                        
-                        for(int i = 0; i < mappa.length; i++){
-                            out.println("<div class=\"rigaPoltrona\">");
-                            for(int j = 0; j < mappa[j].length;j++){
-                                //out.println("<div class=\"car\" id=\"car" + i + "\">");
-                                out.println("<span class=\"poltrona\">");
-                                out.println("<div class\"polt_bottom\"></div>");
-                                if(mappa[i][j].equals("3")){
-                                    out.println("<div class=\"polt-taken\">");
-                                    out.println("</div>");
-                                }
-                                out.println("<div class=\"polt_img\" style=\"backgrund-image: url(img/nerd/Robin_128.png)\"");
-                                out.println("</span>");
-                                }
-                            }
-                        }
-                        out.println("</div>");
-                        out.println("</div>");
-                    
-//  
-//                    for(int i = 0; i < p.size(); i++){
-//                        out.println("<tr>");
-//                        for(int j = 0; j < 2;j++){
-//                            if(p.get(i).isOccupato())
-//                                out.println("<td>-</td>");
-//                            else
-//                                out.println("<td>X</td>");
-//                        }
-//                        out.println("</tr>");
-//                    }*/
-                %>
+                
         </div>
         <div class="content-info">
             
@@ -312,10 +123,23 @@
                             <p>Data: <input type="text" id="datepicker"></p>
                             <p>Orario:
                                 <select name="orario" id="orario">
-                                    <option value="15">15:00</option>
+                                    <%
+                                        out.println(orariDisponibili);
+                                      /*for(int i = 0; i < orariDisponibili.size(); i++){
+                                         Date d = orariDisponibili.get(i);
+                                         SimpleDateFormat dataFormat = new SimpleDateFormat("dd-M-yyyy HH:mm:ss");
+                                         
+                                         String data = dataFormat.format(d);
+                                         
+                                        String ora = data.substring(10).split(":")[0];
+                                        String minuti = data.substring(10).split(":")[1];
+                                        //out.println("<option value=\""+ora+"\">" + ora + ":" + minuti + "</option>");
+                                      }*/
+                                    %>
+                                    <!--<option value="15">15:00</option>
                                     <option value="17">17:00</option>
                                     <option value="19">19:00</option>
-                                    <option value="21">21:00</option>
+                                    <option value="21">21:00</option>-->
                                 </select>
                             </p>
                             <p>
