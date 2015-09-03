@@ -280,7 +280,7 @@ public class Controller extends HttpServlet {
     protected void prenotazione(HttpServletRequest request, HttpServletResponse response)
     {
         List<Prenotazione> prenotazioni = new ArrayList<Prenotazione>();
-        int n_normali = Integer.parseInt(request.getParameter("normale"));
+        //int n_normali = Integer.parseInt(request.getParameter("normale"));
         int n_studenti = Integer.parseInt(request.getParameter("studente"));
         int n_ridotti = Integer.parseInt(request.getParameter("ridotto"));
         int n_militari = Integer.parseInt(request.getParameter("militare"));
@@ -291,7 +291,7 @@ public class Controller extends HttpServlet {
         int id_proiezione = Integer.parseInt(request.getParameter("id_proiezione"));
         String posti = request.getParameter("posti");
         
-   
+        
         String[] coordinatePosti = posti.split(";");
        
         try{

@@ -791,10 +791,10 @@ public class DBManager implements Serializable {
             if(rs.next()){
                 int id_posto = rs.getInt("id_posto");
                 PreparedStatement queryInserimento = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione, pagato) VALUES (?,?,1,?,CURRENT_TIMESTAMP, false) ");
-                 ps.setInt(1, id_utente);
-                 ps.setInt(2, id_proiezione);
-                 ps.setInt(3, id_posto);      
-                 ps.executeUpdate();
+                 queryInserimento.setInt(1, id_utente);
+                 queryInserimento.setInt(2, id_proiezione);
+                 queryInserimento.setInt(3, id_posto);      
+                 queryInserimento.executeUpdate();
             }
             
         }catch(SQLException ex){
@@ -1393,6 +1393,7 @@ public class DBManager implements Serializable {
     
     public String driveIn(Date date){
         String outputMappa = "";
+        int spet=-1;
         try{            
             PreparedStatement ps = con.prepareStatement("SELECT id_spettacolo FROM spettacolo WHERE YEAR(data_ora) = ? AND MONTH(data_ora) = ? AND DAY(data_ora) = ? AND HOUR(data_ora)=? AND MINUTE(data_ora) = ?");
             ps.setInt(1, date.getYear());
@@ -1402,7 +1403,8 @@ public class DBManager implements Serializable {
             ps.setInt(5, date.getMinutes());
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
-               Sala s = new Sala(this,rs.getInt("id_spettacolo"));
+               spet = rs.getInt("id_spettacolo");
+               Sala s = new Sala(this,spet);
                String mappa = s.toString();
                ArrayList<List<String>> matrice = new ArrayList<List<String>>();
                int i=0;
@@ -1465,7 +1467,7 @@ public class DBManager implements Serializable {
         }catch(SQLException ex){
             outputMappa = ex.toString();
         }
-        return outputMappa;
+        return spet+"£"+outputMappa;
     }
 
 }

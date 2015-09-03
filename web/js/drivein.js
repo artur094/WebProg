@@ -61,4 +61,32 @@ $( document ).ready(function() {
         }
     }
     
+    $("#paga").click(function(){
+        
+        var posti="";
+        cars.children().each(function(){
+            if($(this).hasClass("prenotato"))
+            {
+                posti+=$(this).data("posto")+";";
+            }
+        });
+        var l = posti.length;
+        posti = posti.substr(0,l-1);
+        alert(posti+" - spet:"+$("#spet").val()+" - user:" + $("#user").val());
+        $.post("Controller",
+        {
+            op:"prenota",
+            id_utente:$("#user").val(),
+            id_proiezione:$("#spet").val(),
+            n_posti:prenotati,
+            posti:posti,
+            militare:0,
+            studente:0,
+            ridotto:0,
+            disabile:0
+            },function(){
+                alert("pagamento effettuato");
+            }
+        );
+    });
 });

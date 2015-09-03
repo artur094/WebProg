@@ -4,6 +4,8 @@
     Author     : Utente
 --%>
 
+<%@page import="Bean.Spettacolo"%>
+<%@page import="Bean.Utente"%>
 <%@page import="java.util.Date"%>
 <%@page import="Database.DBManager"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -21,6 +23,7 @@
     </head>
     <body>
         <%
+            
             DBManager dbm = new DBManager("jdbc:derby://localhost:1527/CineDB");
             Date d = new Date();
             d.setYear(2015);
@@ -28,25 +31,24 @@
             d.setDate(21);
             d.setHours(0);
             d.setMinutes(0);
-            String s = dbm.disegnaMappa(d, "DriveIn");
+            String ret = dbm.disegnaMappa(d, "DriveIn");
+            int spetID = Integer.parseInt(ret.split("£")[0]);
+            session.setAttribute("spettacolo", spetID);
             
+            String s = ret.split("£")[1];
+            session.setAttribute("user",dbm.authenticate("paolo.chiste-2@studenti.unitn.it", "passwordDiProva"));
+            
+            int user=-1;
+            user = ((Utente)session.getAttribute("user")).getUserID();
+            int spet = -1;
+            spet = (int)session.getAttribute("spettacolo");
         %>
-        
-        <%=s%>
+        <input type=hidden id="user" value=<%=user%>>
+        <input type=hidden id="spet" value=<%=spet%>>
         <div id="paga">PAGA</div>
+        <%=s%>
+        
     </body>
     <script>
-        $(document).ready(function(){//sala spettacolo user
-            $("#paga").click(function(){
-                $.post("Controller",
-                {
-                 op:"prenota";
-                 
-                },
-                
-                );
-                });
-            
-        });
     </script>
 </html>
