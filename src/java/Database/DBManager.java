@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -678,15 +679,8 @@ public class DBManager implements Serializable {
         ResultSet rs = selezioneSpettacoli.executeQuery();
         while(rs.next()){
            int id_corrente = rs.getInt("id_film");
-           if(orariSpettacolo.isEmpty()){
-                orariSpettacolo.add(Date.from(rs.getTimestamp("data_ora").toInstant()));
-           }
-           else{
-                for(Spettacolo s: listaSpettacoli){
-                    if(s.getIDfilm()== id_corrente)
-                        orariSpettacolo.add(rs.getDate("data_ora"));
-                } 
-           }
+           orariSpettacolo.add(Date.from(rs.getTimestamp("data_ora").toInstant()));
+           
            Spettacolo s = new Spettacolo();
            s.setSala(rs.getString("id_sala"));
            s.setIDfilm(rs.getInt("id_film"));
@@ -843,6 +837,8 @@ public class DBManager implements Serializable {
             PreparedStatement ps = con.prepareStatement("INSERT INTO prenotazione(id_utente,id_spettacolo,id_prezzo,id_posto,data_ora_operazione, pagato) VALUES (?,?,?,?,?,false)");
             
             java.sql.Timestamp dataTmp = new java.sql.Timestamp(p.getDataOraOperazione().getTime());
+            dataTmp.setSeconds(0);
+            dataTmp.setNanos(0);
             
             ps.setInt(1, p.getUtente().getUserID());
             ps.setInt(2, p.getSpettacoloID());
@@ -1101,9 +1097,12 @@ public class DBManager implements Serializable {
     //creazione spettacoli
     public boolean CreaSpettacolo(Spettacolo s){
         try{
+            Timestamp ts = new Timestamp(s.getGiorno().getTime());
+            ts.setSeconds(0);
+            ts.setNanos(0);
             PreparedStatement ps = con.prepareStatement("INSERT INTO spettacolo(id_film,data_ora,id_sala) VALUES (?,?,?)");
             ps.setInt(1,s.getIDfilm());
-            ps.setTimestamp(2, new Timestamp(s.getGiorno().getTime()));
+            ps.setTimestamp(2, ts);
             ps.setInt(3, s.getIDsala());
             ps.executeUpdate();
             return true;
@@ -1114,6 +1113,8 @@ public class DBManager implements Serializable {
     
     public boolean CreaSpettacolo(int id_film, int id_sala, Timestamp data){
         try{
+            data.setSeconds(0);
+            data.setNanos(0);
             PreparedStatement ps = con.prepareStatement("INSERT INTO spettacolo(id_film,data_ora,id_sala) VALUES (?,?,?)");
             ps.setInt(1,id_film);
             ps.setTimestamp(2, data);
@@ -1444,6 +1445,46 @@ public class DBManager implements Serializable {
         return p;
     }
     
+    public int getSpettacoloFromDateFilmSala(Date d, int id_film, int id_sala)
+    {
+        try{
+            Timestamp t = new Timestamp(d.getTime());
+            t.setNanos(0);
+            PreparedStatement ps = con.prepareStatement("SELECT id_spettacolo FROM spettacolo WHERE data_ora = ? AND id_sala = ? AND id_film = ?");
+            ps.setTimestamp(1, t);
+            ps.setInt(2, id_sala);
+            ps.setInt(3, id_film);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next())
+            {
+                return rs.getInt("id_spettacolo");
+            }
+        }catch(SQLException ex)
+        {
+            return -1;
+        }
+        return -1;
+    }
+    
+    public int getSpettacoloFromTimestampFilmSala(Timestamp ts, int id_film, int id_sala)
+    {
+        try{
+            PreparedStatement ps = con.prepareStatement("SELECT id_spettacolo FROM spettacolo WHERE data_ora = ? AND id_sala = ? AND id_film = ?");
+            ps.setTimestamp(1, ts);
+            ps.setInt(2, id_sala);
+            ps.setInt(3, id_film);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next())
+            {
+                return rs.getInt("id_spettacolo");
+            }
+        }catch(SQLException ex)
+        {
+            return -1;
+        }
+        return -1;
+    }
+    
     public Prezzo getPrezzo(int id_prezzo)
     {
         Prezzo p = null;
@@ -1491,9 +1532,10 @@ public class DBManager implements Serializable {
         String outputMappa = "";
         int spet=-1;
         try{            
-            PreparedStatement ps = con.prepareStatement("SELECT id_spettacolo FROM spettacolo WHERE YEAR(data_ora) = ? AND MONTH(data_ora) = ? AND DAY(data_ora) = ? AND HOUR(data_ora)=? AND MINUTE(data_ora) = ?");
-            ps.setInt(1, date.getYear());
-            ps.setInt(2, date.getMonth());
+            PreparedStatement ps = con.prepareStatement("SELECT id_spettacolo FROM spettacolo WHERE YEAR(data_ora) = YEAR(?) AND MONTH(data_ora) = month(?) AND DAY(data_ora) = DAY(?) AND HOUR(data_ora)=HOUR(?) AND MINUTE(data_ora) = MINUTE(?)");
+            
+            ps.setInt(1, 1900+date.getYear());
+            ps.setInt(2, 1+date.getMonth());
             ps.setInt(3, date.getDate());
             ps.setInt(4, date.getHours());
             ps.setInt(5, date.getMinutes());
@@ -1515,50 +1557,7 @@ public class DBManager implements Serializable {
                
                int i_riga=0;
                int i_colonna=0;
-               outputMappa+="<div class=\"container-drivein\" id=\"c-drivein\">\n" +
-"            <div class=\"drivein\">\n" +
-"                <div class=\"drivein-opacita\">&nbsp;</div>";
-               for(List<String> riga:matrice)
-               {
-                   outputMappa+="<div class=\"car-lane\" id=\"car-lane"+i_riga+"\">";
-                   for(String colonna:riga)
-                   {
-                       if(i_colonna%2==0)
-                       {
-                         outputMappa+="<div class=\"car\">";
-                         outputMappa+="<span data-posto=\""+i_riga+","+i_colonna+"\" class=\"sedileL ";
-                         if(colonna.equals("2"))//prenotato        
-                         {
-                             outputMappa+="taken\"";
-                         }
-                         if(colonna.equals("3"))//rotto
-                         {
-                             outputMappa+="\" style=\"visibility:hidden\"";
-                         }
-                         outputMappa+=" data-value=\""+colonna+"\">&nbsp;</span>";
-                         
-                       }
-                       else
-                       {
-                           outputMappa+="<span data-posto=\""+i_riga+","+i_colonna+"\" class=\"sedileR ";
-                           if(colonna.equals("2"))//prenotato        
-                            {
-                                outputMappa+="taken\"";
-                            }
-                            if(colonna.equals("3"))//rotto
-                            {
-                                outputMappa+="\" style=\"visibility:hidden\"";
-                            }
-                            outputMappa+=" data-value=\""+colonna+"\">&nbsp;</span></div>";
-                       }
-                       //outputMappa+="<div data-posto=\""+i_riga+","+i_colonna+"\">"+colonna+"</div>";
-                       i_colonna++;
-                   }
-                   outputMappa+="</div>";
-                   i_riga++;
-                   i_colonna=0;
-               }
-               outputMappa+="</div></div></div>";
+
             }
         }catch(SQLException ex){
             outputMappa = ex.toString();

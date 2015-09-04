@@ -32,17 +32,22 @@
         <!--<script src="../jquery-1.9.1.js"></script>-->
         <script src="js/jquery-1.11.3.js"></script>
         <script src="js/jquery-ui.js"></script>
+        <script src="js/<%= sala.getNome().toLowerCase()%>.js"></script>
         <script src="js/infoHome.js"></script>
         <!--<script src="../jquery-ui.min.js"></script>-->
         <!--<script src="../jquery.min.js"></script>-->
         <link href="css/Prenotazione.css" type="text/css" rel="stylesheet">
         <link href="css/jquery-ui.css" type="text/css" rel="stylesheet">
         <link href="css/login.css" type="text/css" rel="stylesheet">
+        <link href="css/<%= sala.getNome().toLowerCase()%>.css" rel="stylesheet">
+        
         <!--<link rel="stylesheet" href="jquery-ui-1.7.2.custom.css" type="text/css">-->
         <script>
   //$(function() {
   $(document).ready(function()
   {
+      
+      
 	$.datepicker.setDefaults($.datepicker.regional['it']);
         //alert($("#id_film").val());
         $( "#datepicker" ).datepicker
@@ -68,9 +73,31 @@
                         }); 
                 },
                 minDate: 0, 
-                maxDate: new Date(<%=(maximumDate.getYear()+1900) + "," + maximumDate.getMonth() + "," + maximumDate.getDate()%>)
+                maxDate: new Date(<%=(maximumDate.getYear()+1900) + "," + maximumDate.getMonth() + "," + maximumDate.getDate()%>),
+                dateFormat: 'dd/mm/yy'
             }
-        );
+        ).datepicker("setDate", "0");
+
+
+        $("#orario").change(function(){
+            
+            $.ajax({
+                        type : 'POST',
+                        url : 'Controller',           
+                        data: {
+                            op : "refreshmappa",
+                            id_film : $('#id_film').val(),
+                            date : $("#datepicker").datepicker({ dateFormat: 'yyyy/MM/dd' }).val()+" "+$("#orario option:selected").text()+":00.000",
+                            id_sala : <%= sala.getId_sala() %>
+                        },
+                        success:function (data) {
+                           // alert(data);
+                            $(".frameSala").append(data.split('£')[1]);
+                            initDrivein();
+                            }
+                        });
+        });
+        
     });
   </script>
     <%

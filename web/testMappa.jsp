@@ -4,6 +4,7 @@
     Author     : Utente
 --%>
 
+<%@page import="Bean.Sala"%>
 <%@page import="Bean.Spettacolo"%>
 <%@page import="Bean.Utente"%>
 <%@page import="java.util.Date"%>
@@ -26,12 +27,17 @@
             
             DBManager dbm = new DBManager("jdbc:derby://localhost:1527/CineDB");
             Date d = new Date();
-            d.setYear(2015);
-            d.setMonth(11);
+            d.setYear(115);
+            d.setMonth(10);
             d.setDate(21);
-            d.setHours(0);
-            d.setMinutes(0);
-            String ret = dbm.disegnaMappa(d, "DriveIn");
+            d.setHours(13);
+            d.setMinutes(20);
+            d.setSeconds(0);
+            
+            
+            int id_spettacolo = dbm.getSpettacoloFromDateFilmSala(d, 12, 2);
+            Sala sala = new Sala(id_spettacolo);
+            String ret = sala.getHTML();
             int spetID = Integer.parseInt(ret.split("£")[0]);
             session.setAttribute("spettacolo", spetID);
             

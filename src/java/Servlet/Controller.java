@@ -118,6 +118,23 @@ public class Controller extends HttpServlet {
             case "hour":
                 calcolaOra(request,response);
                 break;
+            case "refreshmappa":
+                int idfilm = Integer.parseInt(request.getParameter("id_film"));
+                int id_sala = Integer.parseInt(request.getParameter("id_sala"));
+                Timestamp ts = null;
+                String data = request.getParameter("date");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
+                try{
+                    Date parsedDate = dateFormat.parse(data);
+                    ts = new java.sql.Timestamp(parsedDate.getTime());
+                }catch(ParseException ex)
+                {
+                    
+                }
+                
+
+                aggiorna_mappa(response, idfilm,id_sala, ts);
+                break;
             case "psw":
                 String code = request.getParameter("code");
                 String tmp_email = dbm.CheckResetCode(code);
@@ -133,6 +150,17 @@ public class Controller extends HttpServlet {
                 break;
         }
         
+    }
+    
+    protected void aggiorna_mappa(HttpServletResponse response, int id_film,int id_sala, Timestamp ts)
+    {
+        int id_spettacolo = dbm.getSpettacoloFromTimestampFilmSala(ts, id_film, id_sala);
+        Sala s = new Sala(id_spettacolo);
+        try{
+            PrintWriter pw = response.getWriter();
+            pw.println(s.getHTML());
+        }catch(IOException ex)
+        {  }
     }
     
     protected void reset_psw(String email, HttpServletRequest request, HttpServletResponse response)
@@ -547,7 +575,7 @@ public class Controller extends HttpServlet {
         try{
         Date d = new Date();
         String dateConvert ="";
-        dateConvert = data.split("/")[1]+"-"+data.split("/")[0]+"-"+data.split("/")[2];
+        dateConvert = data.split("/")[0]+"-"+data.split("/")[1]+"-"+data.split("/")[2];
         dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         Date parsedDate = dateFormat.parse(dateConvert);
        PrintWriter out = response.getWriter();

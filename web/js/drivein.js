@@ -1,5 +1,7 @@
-$( document ).ready(function() {
+//$( document ).ready(function() {
     //alert('ciao');
+    function initDrivein(){
+    
     var drivein = $('.drivein');
     var cars = $('.car');
     var prenotati = 0;
@@ -89,4 +91,5 @@ $( document ).ready(function() {
             }
         );
     });
-});
+    }
+//});

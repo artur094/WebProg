@@ -166,4 +166,63 @@ public class Sala {
     }
     
     
+    public String getHTML()
+    {
+        switch(nome)
+        {
+            case "DriveIn": 
+                return DriveIn();
+            default: break;
+        }
+        return "";
+    }
+    
+    public String DriveIn()
+    {
+        String outputMappa = "";
+         outputMappa+="<div class=\"container-drivein\" id=\"c-drivein\">\n" +
+    "            <div class=\"drivein\">\n" +
+    "                <div class=\"drivein-opacita\">&nbsp;</div>";
+           for(int i = 0; i < max_righe ; i++)
+           {
+               outputMappa+="<div class=\"car-lane\" id=\"car-lane"+i+"\">";
+               for(int j = 0; j < max_colonne ; j++)
+               {
+                   if(j%2==0)
+                   {
+                     outputMappa+="<div class=\"car\">";
+                     outputMappa+="<span data-posto=\""+i+","+j+"\" class=\"sedileL ";
+                     if(mappa[i][j].equals("2"))//prenotato        
+                     {
+                         outputMappa+="taken\"";
+                     }
+                     if(mappa[i][j].equals("3"))//rotto
+                     {
+                         outputMappa+="\" style=\"visibility:hidden\"";
+                     }
+                     outputMappa+=" data-value=\""+mappa[i][j]+"\">&nbsp;</span>";
+
+                   }
+                   else
+                   {
+                       outputMappa+="<span data-posto=\""+i+","+j+"\" class=\"sedileR ";
+                       if(mappa[i][j].equals("2"))//prenotato        
+                        {
+                            outputMappa+="taken\"";
+                        }
+                        if(mappa[i][j].equals("3"))//rotto
+                        {
+                            outputMappa+="\" style=\"visibility:hidden\"";
+                        }
+                        outputMappa+=" data-value=\""+mappa[i][j]+"\">&nbsp;</span></div>";
+                   }
+                   //outputMappa+="<div data-posto=\""+i_riga+","+i_colonna+"\">"+colonna+"</div>";
+               }
+               outputMappa+="</div>";
+           }
+           outputMappa+="</div></div></div>";
+           return id_spettacolo+"£"+outputMappa;
+    }
+    
+    
 }
