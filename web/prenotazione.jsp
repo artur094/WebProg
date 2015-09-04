@@ -68,8 +68,10 @@
                             date : $("#datepicker").datepicker({ dateFormat: 'yyyy/mm/dd' }).val()
                         },
                         success:function (data) {
-                            alert(data);
-                            $("#orario").append(data);}
+                           // alert(data);
+                            $("#orario").append(data);
+                            refreshMappa();
+                            }
                         }); 
                 },
                 minDate: 0, 
@@ -77,27 +79,33 @@
                 dateFormat: 'dd/mm/yy'
             }
         ).datepicker("setDate", "0");
-
+        
+        function refreshMappa(){
+            $.ajax({
+            type : 'POST',
+            url : 'Controller',           
+            data: {
+                op : "refreshmappa",
+                id_film : $('#id_film').val(),
+                date : $("#datepicker").datepicker({ dateFormat: 'yyyy/MM/dd' }).val()+" "+$("#orario option:first").text()+":00.000",
+                id_sala : <%= sala.getId_sala() %>
+            },
+            success:function (data) {
+               // alert(data);
+               
+                           $(".frameSala").empty();
+                $(".frameSala").append(data.split('£')[1]);
+                initDrivein();
+                }
+            });
+            
+        }
 
         $("#orario").change(function(){
-            
-            $.ajax({
-                        type : 'POST',
-                        url : 'Controller',           
-                        data: {
-                            op : "refreshmappa",
-                            id_film : $('#id_film').val(),
-                            date : $("#datepicker").datepicker({ dateFormat: 'yyyy/MM/dd' }).val()+" "+$("#orario option:selected").text()+":00.000",
-                            id_sala : <%= sala.getId_sala() %>
-                        },
-                        success:function (data) {
-                           // alert(data);
-                            $(".frameSala").append(data.split('£')[1]);
-                            initDrivein();
-                            }
-                        });
-        });
-        
+        refreshMappa();
+    });
+    
+    refreshMappa();
     });
   </script>
     <%
